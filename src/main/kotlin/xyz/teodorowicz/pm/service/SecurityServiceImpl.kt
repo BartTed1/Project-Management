@@ -52,5 +52,17 @@ class SecurityServiceImpl(
         return bCryptPasswordEncoder.encode(password)
     }
 
+    override fun getRoleFromToken(token: String): String {
+        return try {
+            val claims = Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.toByteArray()))
+                .build()
+                .parseClaimsJws(token)
+            claims.body["role"] as String
+        } catch (e: Exception) {
+            throw RuntimeException("Invalid token")
+        }
+    }
+
     /* TODO: implement token revoking */
 }

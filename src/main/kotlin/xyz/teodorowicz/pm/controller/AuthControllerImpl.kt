@@ -82,8 +82,28 @@ class AuthControllerImpl(
         ]
     )
     override fun register(
+        @RequestHeader("Authorization") authorizationHeader: String?,
         @RequestBody @Parameter(description = "Registration request") registrationRequest: RegistrationRequest
     ): ResponseEntity<Response<UserResponse?>> {
+
+        // Check if the user is already registered
+        if (authService.isAnyUserRegistered()) {
+            val role = authorizationHeader
+                ?.removePrefix("Bearer ")
+                ?.let(securityService::getRoleFromToken)
+                ?.lowercase()
+
+            if (role?.contains("admin") != true) {
+                return ResponseEntity.badRequest().body(
+                    Response(
+                        status = 400,
+                        message = "Rejestracja jest możliwa jedynie przez konto administratora",
+                        data = null
+                    )
+                )
+            }
+        }
+
         val user = authService.register(
             email = registrationRequest.email,
             password = registrationRequest.password,

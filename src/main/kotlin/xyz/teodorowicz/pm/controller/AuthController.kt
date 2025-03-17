@@ -38,10 +38,14 @@ interface AuthController {
     /**
      * Registers a new user.
      *
+     * Registration without token is possible only when there are no users in the database.
+     *
+     * @param authorizationHeader The authorization header containing the token.
      * @param registrationRequest The registration request containing the user's details.
      * @return A response entity containing the registration result.
      */
     fun register(
+        @RequestHeader("Authorization") authorizationHeader: String?,
         @RequestBody registrationRequest: RegistrationRequest
     ): ResponseEntity<Response<UserResponse?>>
 }
