@@ -11,7 +11,7 @@ import xyz.teodorowicz.pm.dto.request.LoginRequest
 import xyz.teodorowicz.pm.dto.request.RegistrationRequest
 import xyz.teodorowicz.pm.dto.response.LoginResponse
 import xyz.teodorowicz.pm.dto.response.Response
-import xyz.teodorowicz.pm.entity.User
+import xyz.teodorowicz.pm.dto.response.UserResponse
 import xyz.teodorowicz.pm.service.AuthService
 import xyz.teodorowicz.pm.service.SecurityService
 
@@ -83,7 +83,7 @@ class AuthControllerImpl(
     )
     override fun register(
         @RequestBody @Parameter(description = "Registration request") registrationRequest: RegistrationRequest
-    ): ResponseEntity<Response<User>> {
+    ): ResponseEntity<Response<UserResponse?>> {
         val user = authService.register(
             email = registrationRequest.email,
             password = registrationRequest.password,
@@ -92,11 +92,23 @@ class AuthControllerImpl(
             login = registrationRequest.login
         )
 
+        val userResponse = UserResponse(
+            id = user.id,
+            name = user.name,
+            email = user.email,
+            role = user.role,
+            tasks = user.tasks,
+            files = user.files,
+            messages = user.messages,
+            notifications = user.notifications,
+            teams = user.teams
+        )
+
         return ResponseEntity.ok(
             Response(
                 status = 201,
                 message = "Zarejestrowano pomyślnie",
-                data = user
+                data = userResponse
             )
         )
     }
