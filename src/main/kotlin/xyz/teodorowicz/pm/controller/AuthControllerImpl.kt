@@ -1,5 +1,6 @@
 package xyz.teodorowicz.pm.controller
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -12,6 +13,7 @@ import xyz.teodorowicz.pm.dto.request.RegistrationRequest
 import xyz.teodorowicz.pm.dto.response.LoginResponse
 import xyz.teodorowicz.pm.dto.response.Response
 import xyz.teodorowicz.pm.dto.response.UserResponse
+import xyz.teodorowicz.pm.entity.User
 import xyz.teodorowicz.pm.service.AuthService
 import xyz.teodorowicz.pm.service.SecurityService
 
@@ -31,20 +33,19 @@ class AuthControllerImpl(
             ApiResponse(responseCode = "401", description = "Token is invalid")
         ]
     )
+
     override fun verifyToken(
         @Parameter(description = "Authorization header with Bearer token")
         @RequestHeader("Authorization") authorizationHeader: String
-    ): ResponseEntity<Response<Boolean>> {
+    ): ResponseEntity<Boolean> {
         val token = authorizationHeader.replace("Bearer ", "")
         val isValid = securityService.verifyToken(token)
 
-        return ResponseEntity.ok(
-            Response(
-                status = 200,
-                message = if (isValid) "Token ważny" else "Token nieważny",
-                data = isValid
-            )
-        )
+        return if (isValid) {
+            ResponseEntity.ok().build()
+        } else {
+            ResponseEntity.badRequest().build()
+        }
     }
 
     @PostMapping("/login")
@@ -84,7 +85,7 @@ class AuthControllerImpl(
     override fun register(
         @RequestHeader("Authorization") authorizationHeader: String?,
         @RequestBody @Parameter(description = "Registration request") registrationRequest: RegistrationRequest
-    ): ResponseEntity<Response<UserResponse?>> {
+    ): ResponseEntity<Response<User?>> {
 
         // Check if the user is already registered
         if (authService.isAnyUserRegistered()) {
@@ -112,23 +113,11 @@ class AuthControllerImpl(
             login = registrationRequest.login
         )
 
-        val userResponse = UserResponse(
-            id = user.id,
-            name = user.name,
-            email = user.email,
-            role = user.role,
-            tasks = user.tasks,
-            files = user.files,
-            messages = user.messages,
-            notifications = user.notifications,
-            teams = user.teams
-        )
-
         return ResponseEntity.ok(
             Response(
                 status = 201,
                 message = "Zarejestrowano pomyślnie",
-                data = userResponse
+                data = user
             )
         )
     }

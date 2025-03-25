@@ -1,5 +1,6 @@
 package xyz.teodorowicz.pm.entity
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
 
 @Entity
@@ -7,13 +8,14 @@ import jakarta.persistence.*
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int = 0,
+    val id: Long = 0,
     
     val name: String,
     
     @Column(unique = true)
     val email: String,
-    
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     val password: String,
     
     val role: String = "USER",

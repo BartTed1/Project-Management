@@ -8,6 +8,7 @@ import xyz.teodorowicz.pm.dto.request.RegistrationRequest
 import xyz.teodorowicz.pm.dto.response.LoginResponse
 import xyz.teodorowicz.pm.dto.response.Response
 import xyz.teodorowicz.pm.dto.response.UserResponse
+import xyz.teodorowicz.pm.entity.User
 
 interface AuthController {
 
@@ -19,7 +20,7 @@ interface AuthController {
      */
     fun verifyToken(
         @RequestHeader("Authorization") authorizationHeader: String
-    ): ResponseEntity<Response<Boolean>>
+    ): ResponseEntity<Boolean>
 
 
 
@@ -47,5 +48,5 @@ interface AuthController {
     fun register(
         @RequestHeader("Authorization") authorizationHeader: String?,
         @RequestBody registrationRequest: RegistrationRequest
-    ): ResponseEntity<Response<UserResponse?>>
+    ): ResponseEntity<Response<User?>>
 }
