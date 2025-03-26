@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import xyz.teodorowicz.pm.dto.request.LoginRequest
@@ -20,6 +21,7 @@ import xyz.teodorowicz.pm.service.SecurityService
 @RestController
 @RequestMapping("auth")
 @Tag(name = "Authentication API", description = "API for user authentication")
+@CrossOrigin(origins = ["*"])
 class AuthControllerImpl(
     private val authService: AuthService,
     private val securityService: SecurityService
@@ -44,7 +46,7 @@ class AuthControllerImpl(
         return if (isValid) {
             ResponseEntity.ok().build()
         } else {
-            ResponseEntity.badRequest().build()
+            ResponseEntity.status(401).build()
         }
     }
 
@@ -88,22 +90,22 @@ class AuthControllerImpl(
     ): ResponseEntity<Response<User?>> {
 
         // Check if the user is already registered
-        if (authService.isAnyUserRegistered()) {
-            val role = authorizationHeader
-                ?.removePrefix("Bearer ")
-                ?.let(securityService::getRoleFromToken)
-                ?.lowercase()
-
-            if (role?.contains("admin") != true) {
-                return ResponseEntity.badRequest().body(
-                    Response(
-                        status = 400,
-                        message = "Rejestracja jest możliwa jedynie przez konto administratora",
-                        data = null
-                    )
-                )
-            }
-        }
+//        if (authService.isAnyUserRegistered()) {
+//            val role = authorizationHeader
+//                ?.removePrefix("Bearer ")
+//                ?.let(securityService::getRoleFromToken)
+//                ?.lowercase()
+//
+//            if (role?.contains("admin") != true) {
+//                return ResponseEntity.badRequest().body(
+//                    Response(
+//                        status = 400,
+//                        message = "Rejestracja jest możliwa jedynie przez konto administratora",
+//                        data = null
+//                    )
+//                )
+//            }
+//        }
 
         val user = authService.register(
             email = registrationRequest.email,

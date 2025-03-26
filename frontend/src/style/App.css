@@ -1,0 +1,15 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  background-color: #343a40; 
+  color: #fff; 
+}
+
+.dark-background {
+  background-color: #343a40;
+  color: #fff;
+}
+
+.markdown > p > img {
+  width: 100%;
+}
