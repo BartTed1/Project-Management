@@ -8,7 +8,6 @@ export const verify = async () => {
         }
     });
 
-    console.log(response);
     if (response.ok) {
         // const data = await response.json();
         // localStorage.setItem("user", JSON.stringify(data));
