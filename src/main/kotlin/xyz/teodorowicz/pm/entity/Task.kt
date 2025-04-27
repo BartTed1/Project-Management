@@ -15,8 +15,8 @@ data class Task(
     val description: String? = null,
     
     @ManyToOne
-    @JoinColumn(name = "teamId")
-    val team: Team,
+    @JoinColumn(name = "projectId")
+    val project: Project,
     
     @ManyToOne
     @JoinColumn(name = "userId")

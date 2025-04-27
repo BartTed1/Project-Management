@@ -4,9 +4,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import xyz.teodorowicz.pm.dto.response.Response
-import xyz.teodorowicz.pm.exception.BadRequestException
-import xyz.teodorowicz.pm.exception.NotFoundException
-import xyz.teodorowicz.pm.exception.UnauthorizedException
+import xyz.teodorowicz.pm.exception.*
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -38,7 +36,29 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(404).body(
             Response(
                 status = 404,
-                message = ex.message ?: "Nie znaleziono",
+                message = "Nie znaleziono",
+                data = null
+            )
+        )
+    }
+
+    @ExceptionHandler(ForbiddenException::class)
+    fun handleForbidden(ex: ForbiddenException): ResponseEntity<Response<Nothing?>> {
+        return ResponseEntity.status(403).body(
+            Response(
+                status = 403,
+                message = "Zabroniony dostęp",
+                data = null
+            )
+        )
+    }
+
+    @ExceptionHandler(InternalServerErrorException::class)
+    fun handleInternalServerError(ex: InternalServerErrorException): ResponseEntity<Response<Nothing?>> {
+        return ResponseEntity.status(500).body(
+            Response(
+                status = 500,
+                message = "Wewnętrzny błąd serwera",
                 data = null
             )
         )

@@ -2,83 +2,81 @@ package xyz.teodorowicz.pm.controller
 
 import org.springframework.data.repository.query.Param
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestMapping
-import xyz.teodorowicz.pm.dto.request.UpdateUserRequest
-import xyz.teodorowicz.pm.dto.response.Response
-import xyz.teodorowicz.pm.dto.response.UserResponse
+import xyz.teodorowicz.pm.annotation.JwtToken
+import xyz.teodorowicz.pm.dto.request.auth.UpdateUserRequest
+import xyz.teodorowicz.pm.entity.User
+import xyz.teodorowicz.pm.model.JwtTokenData
 
 interface UserController {
 
     /**
      * Get all users
      *
-     * @param authorizationHeader Authorization header
+     * @param token JWT token
      * @param page Page number
      * @param size Page size
      * @return ResponseEntity with a list of users
      */
     fun getUsers(
-        @RequestHeader("Authorization") authorizationHeader: String,
+        @JwtToken token: JwtTokenData?,
         @Param("page") page: Int,
         @Param("size") size: Int,
-    ): ResponseEntity<Response<Array<UserResponse>>>
+    ): ResponseEntity<List<User>>
 
 
 
     /**
      * Get user by id
      *
-     * @param authorizationHeader Authorization header
+     * @param token JWT token
      * @param id User id
      * @return ResponseEntity with user
      */
     fun getUser(
-        @RequestHeader("Authorization") authorizationHeader: String,
+        @JwtToken token: JwtTokenData?,
         @PathVariable("id") id: Long
-    ): ResponseEntity<Response<UserResponse?>>
+    ): ResponseEntity<User>
 
 
 
     /**
      * Get user by email
      *
-     * @param authorizationHeader Authorization header
+     * @param token JWT token
      * @param email User email
      * @return ResponseEntity with user
      */
     fun getUserByEmail(
-        @RequestHeader("Authorization") authorizationHeader: String,
+        @JwtToken token: JwtTokenData?,
         @Param("email") email: String
-    ): ResponseEntity<Response<UserResponse?>>
+    ): ResponseEntity<User>
 
 
 
     /**
      * Update user
      *
-     * @param authorizationHeader Authorization header
+     * @param token JWT token
      * @param body User data - all optional, only fields to update
      */
     fun updateUser(
-        @RequestHeader("Authorization") authorizationHeader: String,
-        @RequestBody body: UpdateUserRequest
-    ): ResponseEntity<Response<UserResponse?>>
+        @JwtToken token: JwtTokenData?,
+        @PathVariable("id") id: Long,
+        @RequestBody body: UpdateUserRequest,
+    ): ResponseEntity<User>
 
 
 
     /**
      * Delete user
      *
-     * @param authorizationHeader Authorization header
+     * @param token JWT token
      * @param id User id
-     * @return If user was deleted
      */
     fun deleteUser(
-        @RequestHeader("Authorization") authorizationHeader: String,
-        @Param("id") id: Long
-    ): ResponseEntity<Response<Boolean>>
+        @JwtToken token: JwtTokenData?,
+        @PathVariable("id") id: Long
+    ): ResponseEntity<Unit>
 }

@@ -1,19 +1,23 @@
 package xyz.teodorowicz.pm.controller
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-import xyz.teodorowicz.pm.dto.request.LoginRequest
-import xyz.teodorowicz.pm.dto.request.RegistrationRequest
+import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import xyz.teodorowicz.pm.annotation.JwtToken
+import xyz.teodorowicz.pm.model.JwtTokenData
+import xyz.teodorowicz.pm.dto.request.auth.LoginRequest
+import xyz.teodorowicz.pm.dto.request.auth.RegistrationRequest
 import xyz.teodorowicz.pm.dto.response.LoginResponse
 import xyz.teodorowicz.pm.dto.response.Response
-import xyz.teodorowicz.pm.dto.response.UserResponse
 import xyz.teodorowicz.pm.entity.User
 import xyz.teodorowicz.pm.service.AuthService
 import xyz.teodorowicz.pm.service.SecurityService
@@ -35,19 +39,11 @@ class AuthControllerImpl(
             ApiResponse(responseCode = "401", description = "Token is invalid")
         ]
     )
-
     override fun verifyToken(
-        @Parameter(description = "Authorization header with Bearer token")
-        @RequestHeader("Authorization") authorizationHeader: String
+        @Parameter(description = "JWT token")
+        @JwtToken token: JwtTokenData
     ): ResponseEntity<Boolean> {
-        val token = authorizationHeader.replace("Bearer ", "")
-        val isValid = securityService.verifyToken(token)
-
-        return if (isValid) {
-            ResponseEntity.ok().build()
-        } else {
-            ResponseEntity.status(401).build()
-        }
+        return ResponseEntity.ok(true)
     }
 
     @PostMapping("/login")
@@ -85,28 +81,9 @@ class AuthControllerImpl(
         ]
     )
     override fun register(
-        @RequestHeader("Authorization") authorizationHeader: String?,
+        @JwtToken token: JwtTokenData?,
         @RequestBody @Parameter(description = "Registration request") registrationRequest: RegistrationRequest
     ): ResponseEntity<Response<User?>> {
-
-        // Check if the user is already registered
-//        if (authService.isAnyUserRegistered()) {
-//            val role = authorizationHeader
-//                ?.removePrefix("Bearer ")
-//                ?.let(securityService::getRoleFromToken)
-//                ?.lowercase()
-//
-//            if (role?.contains("admin") != true) {
-//                return ResponseEntity.badRequest().body(
-//                    Response(
-//                        status = 400,
-//                        message = "Rejestracja jest możliwa jedynie przez konto administratora",
-//                        data = null
-//                    )
-//                )
-//            }
-//        }
-
         val user = authService.register(
             email = registrationRequest.email,
             password = registrationRequest.password,

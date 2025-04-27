@@ -4,6 +4,14 @@ import xyz.teodorowicz.pm.entity.User
 
 abstract class SecurityService {
     /**
+     * Parse the JWT token and return its claims.
+     *
+     * @param token The JWT token to parse.
+     * @return Map of claims from the token.
+     */
+    internal abstract fun getTokenClaims(token: String): Map<String, Any>
+
+    /**
      * Verify the provided JWT token.
      *
      * @param token The JWT token to verify.

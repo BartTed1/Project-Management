@@ -1,4 +1,4 @@
-package xyz.teodorowicz.pm.dto.request
+package xyz.teodorowicz.pm.dto.request.auth
 
 data class RegistrationRequest(
     val email: String,

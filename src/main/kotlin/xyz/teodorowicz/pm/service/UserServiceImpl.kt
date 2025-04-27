@@ -3,7 +3,7 @@ package xyz.teodorowicz.pm.service
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import xyz.teodorowicz.pm.dto.request.UpdateUserRequest
+import xyz.teodorowicz.pm.dto.request.auth.UpdateUserRequest
 import xyz.teodorowicz.pm.entity.User
 import xyz.teodorowicz.pm.repository.UserRepository
 
@@ -40,7 +40,6 @@ class UserServiceImpl(
         val updatedUser = existingUser.copy(
             name = request.name ?: existingUser.name,
             email = request.email ?: existingUser.email,
-            role = request.role ?: existingUser.role
         )
 
         return userRepository.save(updatedUser)

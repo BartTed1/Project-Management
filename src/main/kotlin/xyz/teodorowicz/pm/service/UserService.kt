@@ -1,6 +1,6 @@
 package xyz.teodorowicz.pm.service
 
-import xyz.teodorowicz.pm.dto.request.UpdateUserRequest
+import xyz.teodorowicz.pm.dto.request.auth.UpdateUserRequest
 import xyz.teodorowicz.pm.entity.User
 
 abstract class UserService {

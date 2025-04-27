@@ -2,12 +2,12 @@ package xyz.teodorowicz.pm.controller
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
-import xyz.teodorowicz.pm.dto.request.LoginRequest
-import xyz.teodorowicz.pm.dto.request.RegistrationRequest
+import xyz.teodorowicz.pm.annotation.JwtToken
+import xyz.teodorowicz.pm.model.JwtTokenData
+import xyz.teodorowicz.pm.dto.request.auth.LoginRequest
+import xyz.teodorowicz.pm.dto.request.auth.RegistrationRequest
 import xyz.teodorowicz.pm.dto.response.LoginResponse
 import xyz.teodorowicz.pm.dto.response.Response
-import xyz.teodorowicz.pm.dto.response.UserResponse
 import xyz.teodorowicz.pm.entity.User
 
 interface AuthController {
@@ -15,11 +15,11 @@ interface AuthController {
     /**
      * Verifies the provided token.
      *
-     * @param authorizationHeader The authorization header containing the token.
+     * @param token The JWT token.
      * @return A response entity containing the verification result.
      */
     fun verifyToken(
-        @RequestHeader("Authorization") authorizationHeader: String
+        @JwtToken token: JwtTokenData
     ): ResponseEntity<Boolean>
 
 
@@ -41,12 +41,12 @@ interface AuthController {
      *
      * Registration without token is possible only when there are no users in the database.
      *
-     * @param authorizationHeader The authorization header containing the token.
+     * @param token The JWT token.
      * @param registrationRequest The registration request containing the user's details.
      * @return A response entity containing the registration result.
      */
     fun register(
-        @RequestHeader("Authorization") authorizationHeader: String?,
+        @JwtToken token: JwtTokenData?,
         @RequestBody registrationRequest: RegistrationRequest
     ): ResponseEntity<Response<User?>>
 }

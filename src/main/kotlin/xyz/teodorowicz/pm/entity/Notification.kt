@@ -17,8 +17,8 @@ data class Notification(
     val user: User,
     
     @ManyToOne
-    @JoinColumn(name = "teamId")
-    val team: Team,
+    @JoinColumn(name = "projectId")
+    val project: Project,
     
     @Column(nullable = false, updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),

@@ -11,5 +11,5 @@ data class UserResponse(
     val files: List<File>,
     val messages: List<Message>,
     val notifications: List<Notification>,
-    val teams: List<Team>,
+    val projects: List<Project>,
 )

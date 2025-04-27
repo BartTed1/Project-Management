@@ -41,7 +41,6 @@ class AuthServiceImpl(
             name = "$firstName $lastName",
             email = email,
             password = hashedPassword,
-            role = "USER"
         )
 
         return userRepository.save(user)
