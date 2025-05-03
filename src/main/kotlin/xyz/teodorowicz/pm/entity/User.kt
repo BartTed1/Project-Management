@@ -11,32 +11,41 @@ data class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    val name: String,
+    var name: String,
 
     @Column(unique = true)
-    val email: String,
+    var email: String,
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    val password: String,
+    var password: String,
 
     @Column(nullable = false)
-    val role: SystemRole? = SystemRole.USER,
+    var role: SystemRole? = SystemRole.USER,
 
-    @OneToMany(mappedBy = "owner")
-    val ownedTeams: MutableList<Project> = mutableListOf(),
-
-    @OneToMany(mappedBy = "user")
-    val tasks: MutableList<Task> = mutableListOf(),
-
-    @OneToMany(mappedBy = "user")
-    val files: MutableList<File> = mutableListOf(),
+    @OneToMany(
+        mappedBy = "owner",
+        cascade = [CascadeType.PERSIST, CascadeType.MERGE],
+        fetch = FetchType.LAZY
+    )
+    var ownedProjects: MutableList<Project> = mutableListOf(),
 
     @OneToMany(mappedBy = "user")
-    val messages: MutableList<Message> = mutableListOf(),
+    var tasks: MutableList<Task> = mutableListOf(),
 
     @OneToMany(mappedBy = "user")
-    val notifications: MutableList<Notification> = mutableListOf(),
+    var files: MutableList<File> = mutableListOf(),
 
-    @ManyToMany
-    val projects: MutableList<Project> = mutableListOf(),
+    @OneToMany(mappedBy = "user")
+    var messages: MutableList<Message> = mutableListOf(),
+
+    @OneToMany(mappedBy = "user")
+    var notifications: MutableList<Notification> = mutableListOf(),
+
+    @OneToMany(
+        mappedBy = "user",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    var projectMemberships: MutableSet<ProjectMember> = mutableSetOf(),
 )

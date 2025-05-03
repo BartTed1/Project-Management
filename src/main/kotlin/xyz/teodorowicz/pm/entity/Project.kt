@@ -3,6 +3,7 @@ package xyz.teodorowicz.pm.entity
 import jakarta.persistence.*
 import xyz.teodorowicz.pm.enumeration.project.ProjectPriority
 import xyz.teodorowicz.pm.enumeration.project.ProjectStatus
+import xyz.teodorowicz.pm.model.UserWithRole
 import java.time.LocalDate
 
 @Entity
@@ -14,26 +15,36 @@ data class Project(
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    val owner: User,
+    var owner: User,
 
     @Column(nullable = false)
-    val name: String,
+    var name: String,
 
     @Column(nullable = false)
-    val description: String = "",
+    var description: String = "",
 
     @Column(name = "planned_start_date", nullable = false)
-    val plannedStartDate: LocalDate = LocalDate.now(),
+    var plannedStartDate: LocalDate = LocalDate.now(),
 
     @Column(name = "planned_end_date", nullable = true)
-    val plannedEndDate: LocalDate? = null,
+    var plannedEndDate: LocalDate? = null,
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "project_roles", joinColumns = [JoinColumn(name = "project_id")])
+    @Column(name = "role")
+    var roles: Set<String> = mutableSetOf(),
 
     @Enumerated(EnumType.STRING)
-    val status: ProjectStatus = ProjectStatus.NOT_STARTED,
+    var status: ProjectStatus = ProjectStatus.NOT_STARTED,
 
     @Enumerated(EnumType.STRING)
-    val priority: ProjectPriority = ProjectPriority.NORMAL,
+    var priority: ProjectPriority = ProjectPriority.NORMAL,
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    val teamMembers: MutableList<User> = mutableListOf(),
+    @OneToMany(
+        mappedBy = "project",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    var members: MutableSet<ProjectMember> = mutableSetOf()
 )

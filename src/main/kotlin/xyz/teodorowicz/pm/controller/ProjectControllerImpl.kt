@@ -6,8 +6,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.data.repository.query.Param
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import xyz.teodorowicz.pm.annotation.JwtToken
+import xyz.teodorowicz.pm.annotation.SystemRole
 import xyz.teodorowicz.pm.dto.request.project.AssignUserToProjectRequest
 import xyz.teodorowicz.pm.dto.request.project.CreateProjectRequest
 import xyz.teodorowicz.pm.dto.request.project.UpdateProjectRequest
@@ -15,12 +18,19 @@ import xyz.teodorowicz.pm.entity.Project
 import xyz.teodorowicz.pm.enumeration.SortDirection
 import xyz.teodorowicz.pm.enumeration.project.ProjectPriority
 import xyz.teodorowicz.pm.enumeration.project.ProjectStatus
+import xyz.teodorowicz.pm.exception.InternalServerErrorException
+import xyz.teodorowicz.pm.exception.NotFoundException
+import xyz.teodorowicz.pm.model.JwtTokenData
+import xyz.teodorowicz.pm.service.ProjectService
+import xyz.teodorowicz.pm.enumeration.user.SystemRole as SystemRoleEnum
 
 @RestController
 @RequestMapping("projects")
 @Tag(name = "Project API", description = "API for project management")
 @CrossOrigin(origins = ["*"])
-class ProjectControllerImpl : ProjectController {
+class ProjectControllerImpl(
+    private val projectService: ProjectService
+) : ProjectController {
 
     @PostMapping
     @Operation(summary = "Create a new project", description = "Creates a new project with the given details.")
@@ -33,15 +43,14 @@ class ProjectControllerImpl : ProjectController {
         ]
     )
     override fun createProject(
-        @Parameter(name = "Authorization header with Bearer token")
-        @RequestHeader("Authorization")
-        authorizationHeader: String?,
+        @Parameter(description = "JWT token")
+        @JwtToken token: JwtTokenData?,
 
         @Parameter(name = "Project details", description = "Details of the project to be created")
-        @RequestBody
-        request: CreateProjectRequest
+        @RequestBody body: CreateProjectRequest
     ): ResponseEntity<Project> {
-        TODO("Not yet implemented")
+        val project = projectService.createProject(token, body)
+        return ResponseEntity.status(HttpStatus.CREATED).body(project)
     }
 
     @GetMapping("/{projectId}")
@@ -55,15 +64,15 @@ class ProjectControllerImpl : ProjectController {
         ]
     )
     override fun getProject(
-        @Parameter(name = "Authorization header with Bearer token")
-        @RequestHeader("Authorization")
-        authorizationHeader: String?,
+        @Parameter(description = "JWT token")
+        @JwtToken token: JwtTokenData?,
 
         @Parameter(name = "Project ID", description = "ID of the project to be retrieved")
         @PathVariable("projectId")
         projectId: String
     ): ResponseEntity<Project> {
-        TODO("Not yet implemented")
+        val project = projectService.getProject(projectId)
+        return ResponseEntity.ok(project)
     }
 
     @PutMapping("/{projectId}")
@@ -78,9 +87,8 @@ class ProjectControllerImpl : ProjectController {
         ]
     )
     override fun updateProject(
-        @Parameter(name = "Authorization header with Bearer token")
-        @RequestHeader("Authorization")
-        authorizationHeader: String?,
+        @Parameter(description = "JWT token")
+        @JwtToken token: JwtTokenData?,
 
         @Parameter(name = "Project ID", description = "ID of the project to be updated")
         @PathVariable("projectId")
@@ -90,7 +98,8 @@ class ProjectControllerImpl : ProjectController {
         @RequestBody
         request: UpdateProjectRequest
     ): ResponseEntity<Project> {
-        TODO("Not yet implemented")
+        val project = projectService.updateProject(projectId, request)
+        return ResponseEntity.ok(project)
     }
 
     @GetMapping
@@ -103,39 +112,39 @@ class ProjectControllerImpl : ProjectController {
         ]
     )
     override fun listProjects(
-        @Parameter(name = "Authorization header with Bearer token")
-        @RequestHeader("Authorization")
-        authorizationHeader: String?,
+        @Parameter(description = "JWT token")
+        @JwtToken token: JwtTokenData?,
 
         @Parameter(name = "Search query", description = "Query to filter projects by name, description or usernames")
-        @Param("query")
+        @RequestParam("query")
         query: String?,
 
         @Parameter(name = "Page number", description = "Page number for pagination")
-        @Param("page")
+        @RequestParam("page")
         page: Int,
 
         @Parameter(name = "Page size", description = "Number of projects per page")
-        @Param("size")
+        @RequestParam("size")
         size: Int,
 
         @Parameter(name = "Project status", description = "Status of the projects to filter by")
-        @Param("status")
+        @RequestParam("status")
         status: ProjectStatus?,
 
         @Parameter(name = "Project priority", description = "Priority of the projects to filter by")
-        @Param("priority")
+        @RequestParam("priority")
         priority: ProjectPriority?,
 
         @Parameter(name = "Sort by", description = "Field to sort the projects by")
-        @Param("sortBy")
+        @RequestParam("sortBy")
         sortBy: String?,
 
         @Parameter(name = "Sort direction", description = "Direction to sort the projects (ascending or descending)")
-        @Param("sortDirection")
+        @RequestParam("sortDirection")
         sortDirection: SortDirection?,
     ): ResponseEntity<List<Project>> {
-        TODO("Not yet implemented")
+        val projects = projectService.listProjects(query, page, size, status, priority, sortBy, sortDirection)
+        return ResponseEntity.ok(projects)
     }
 
     @DeleteMapping("/{projectId}")
@@ -148,16 +157,17 @@ class ProjectControllerImpl : ProjectController {
             ApiResponse(responseCode = "404", description = "Project not found")
         ]
     )
+    @SystemRole(SystemRoleEnum.ADMIN)
     override fun deleteProject(
-        @Parameter(name = "Authorization header with Bearer token")
-        @RequestHeader("Authorization")
-        authorizationHeader: String?,
+        @Parameter(description = "JWT token")
+        @JwtToken token: JwtTokenData?,
 
         @Parameter(name = "Project ID", description = "ID of the project to be deleted")
         @PathVariable("projectId")
         projectId: String
     ): ResponseEntity<Unit> {
-        TODO("Not yet implemented")
+        projectService.deleteProject(token, projectId)
+        return ResponseEntity.noContent().build()
     }
 
     @PostMapping("/{projectId}/role")
@@ -171,10 +181,10 @@ class ProjectControllerImpl : ProjectController {
             ApiResponse(responseCode = "404", description = "Project not found")
         ]
     )
+    @SystemRole(SystemRoleEnum.ADMIN)
     override fun createProjectRole(
-        @Parameter(name = "Authorization header with Bearer token")
-        @RequestHeader("Authorization")
-        authorizationHeader: String?,
+        @Parameter(description = "JWT token")
+        @JwtToken token: JwtTokenData?,
 
         @Parameter(name = "Project ID", description = "ID of the project to create the role for")
         @PathVariable("projectId")
@@ -184,8 +194,13 @@ class ProjectControllerImpl : ProjectController {
         @RequestBody
         roleName: String
     ): ResponseEntity<Unit> {
-        TODO("Not yet implemented")
+        projectService.createProjectRole(token, projectId, roleName)
+        return ResponseEntity.status(HttpStatus.CREATED).build()
     }
+
+
+
+
 
     @DeleteMapping("/{projectId}/role")
     @Operation(summary = "Delete a project role", description = "Deletes the specified role from the project.")
@@ -198,10 +213,10 @@ class ProjectControllerImpl : ProjectController {
             ApiResponse(responseCode = "404", description = "Project not found")
         ]
     )
+    @SystemRole(SystemRoleEnum.ADMIN)
     override fun deleteProjectRole(
-        @Parameter(name = "Authorization header with Bearer token")
-        @RequestHeader("Authorization")
-        authorizationHeader: String?,
+        @Parameter(description = "JWT token")
+        @JwtToken token: JwtTokenData?,
 
         @Parameter(name = "Project ID", description = "ID of the project to delete the role from")
         @PathVariable("projectId")
@@ -211,8 +226,13 @@ class ProjectControllerImpl : ProjectController {
         @RequestBody
         roleName: String
     ): ResponseEntity<Unit> {
-        TODO("Not yet implemented")
+        projectService.deleteProjectRole(token, projectId, roleName)
+        return ResponseEntity.noContent().build()
     }
+
+
+
+
 
     @PostMapping("/{projectId}/users")
     @Operation(summary = "Assign users to a project", description = "Assigns users to the specified project with a specific role.")
@@ -226,9 +246,8 @@ class ProjectControllerImpl : ProjectController {
         ]
     )
     override fun assignUsersToProject(
-        @Parameter(name = "Authorization header with Bearer token")
-        @RequestHeader("Authorization")
-        authorizationHeader: String?,
+        @Parameter(description = "JWT token")
+        @JwtToken token: JwtTokenData?,
 
         @Parameter(name = "Project ID", description = "ID of the project to assign the users to")
         @PathVariable("projectId")
@@ -236,10 +255,14 @@ class ProjectControllerImpl : ProjectController {
 
         @Parameter(name = "Assignment details", description = "Details of the users to be assigned and their roles")
         @RequestBody
-        assignUserToProjectRequest: AssignUserToProjectRequest
+        assignUsersToProjectRequest: AssignUserToProjectRequest
     ): ResponseEntity<Unit> {
-        TODO("Not yet implemented")
+        projectService.assignUsersToProject(token, projectId, assignUsersToProjectRequest)
+        return ResponseEntity.ok().build()
     }
+
+
+
 
     @DeleteMapping("/{projectId}/users")
     @Operation(summary = "Remove users from a project", description = "Removes the specified users from the project.")
@@ -252,10 +275,10 @@ class ProjectControllerImpl : ProjectController {
             ApiResponse(responseCode = "404", description = "Project or users not found")
         ]
     )
+    @SystemRole(SystemRoleEnum.ADMIN)
     override fun removeUserFromProject(
-        @Parameter(name = "Authorization header with Bearer token")
-        @RequestHeader("Authorization")
-        authorizationHeader: String?,
+        @Parameter(description = "JWT token")
+        @JwtToken token: JwtTokenData?,
 
         @Parameter(name = "Project ID", description = "ID of the project to remove the users from")
         @PathVariable("projectId")
@@ -265,6 +288,7 @@ class ProjectControllerImpl : ProjectController {
         @RequestBody
         userIds: List<Long>
     ): ResponseEntity<Unit> {
-        TODO("Not yet implemented")
+        projectService.removeUserFromProject(token, projectId, userIds)
+        return ResponseEntity.ok().build()
     }
 }

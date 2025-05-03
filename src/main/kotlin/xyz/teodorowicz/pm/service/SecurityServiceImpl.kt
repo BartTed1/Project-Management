@@ -42,6 +42,7 @@ class SecurityServiceImpl(
             .setSubject(user.id.toString())
             .setIssuedAt(now)
             .setExpiration(expiryDate)
+            .claim("userId", user.id)
             .claim("email", user.email)
             .claim("role", user.role)
             .signWith(Keys.hmacShaKeyFor(jwtSecret.toByteArray()))

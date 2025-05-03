@@ -14,6 +14,7 @@ import xyz.teodorowicz.pm.annotation.JwtToken
 import xyz.teodorowicz.pm.model.JwtTokenData
 import xyz.teodorowicz.pm.service.SecurityService
 import jakarta.servlet.http.HttpServletRequest
+import xyz.teodorowicz.pm.model.JwtTokenClaims
 
 class JwtTokenArgumentResolver(
     private val securityService: SecurityService
@@ -44,7 +45,8 @@ class JwtTokenArgumentResolver(
                 throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token")
             }
             val claims = securityService.getTokenClaims(token)
-            return JwtTokenData(claims = claims, token = token)
+            val parsedClaims = JwtTokenClaims.fromMap(claims)
+            return JwtTokenData(claims = parsedClaims, token = token)
         } catch (e: ExpiredJwtException) {
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token has expired")
         } catch (e: SignatureException) {

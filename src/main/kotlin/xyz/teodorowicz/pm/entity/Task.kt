@@ -10,9 +10,9 @@ data class Task(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     
-    val title: String,
+    var title: String,
     
-    val description: String? = null,
+    var description: String? = null,
     
     @ManyToOne
     @JoinColumn(name = "projectId")
@@ -20,16 +20,16 @@ data class Task(
     
     @ManyToOne
     @JoinColumn(name = "userId")
-    val user: User? = null,
+    var user: User? = null,
     
     @Column(nullable = false, updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
     
     var updatedAt: LocalDateTime = LocalDateTime.now(),
     
-    val deadline: LocalDateTime,
+    var deadline: LocalDateTime,
     
-    val endAt: LocalDateTime? = null,
+    var endAt: LocalDateTime? = null,
     
     val status: String = "DURING",
     

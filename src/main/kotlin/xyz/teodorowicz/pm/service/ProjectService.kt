@@ -7,32 +7,32 @@ import xyz.teodorowicz.pm.entity.Project
 import xyz.teodorowicz.pm.enumeration.SortDirection
 import xyz.teodorowicz.pm.enumeration.project.ProjectPriority
 import xyz.teodorowicz.pm.enumeration.project.ProjectStatus
+import xyz.teodorowicz.pm.model.JwtTokenData
 
 interface ProjectService {
-    fun createProject(authorizationHeader: String?, request: CreateProjectRequest): Project
+    fun createProject(token: JwtTokenData?, request: CreateProjectRequest): Project
     
-    fun getProject(authorizationHeader: String?, projectId: String): Project
+    fun getProject(projectId: String): Project
     
-    fun updateProject(authorizationHeader: String?, projectId: String, request: UpdateProjectRequest): Project
+    fun updateProject(projectId: String, request: UpdateProjectRequest): Project
     
     fun listProjects(
-        authorizationHeader: String?,
-        query: String?,
-        page: Int,
-        size: Int,
+        s: String?,
+        page: Int = 0,
+        size: Int = 20,
         status: ProjectStatus?,
         priority: ProjectPriority?,
         sortBy: String?,
         sortDirection: SortDirection?
     ): List<Project>
     
-    fun deleteProject(authorizationHeader: String?, projectId: String)
+    fun deleteProject(token: JwtTokenData?, projectId: String)
     
-    fun createProjectRole(authorizationHeader: String?, projectId: String, roleName: String)
+    fun createProjectRole(token: JwtTokenData?, projectId: String, roleName: String)
     
-    fun deleteProjectRole(authorizationHeader: String?, projectId: String, roleName: String)
+    fun deleteProjectRole(token: JwtTokenData?, projectId: String, roleName: String)
     
-    fun assignUsersToProject(authorizationHeader: String?, projectId: String, request: AssignUserToProjectRequest)
+    fun assignUsersToProject(token: JwtTokenData?, projectId: String, request: AssignUserToProjectRequest)
     
-    fun removeUserFromProject(authorizationHeader: String?, projectId: String, userIds: List<Long>)
+    fun removeUserFromProject(token: JwtTokenData?, projectId: String, userIds: List<Long>)
 }
