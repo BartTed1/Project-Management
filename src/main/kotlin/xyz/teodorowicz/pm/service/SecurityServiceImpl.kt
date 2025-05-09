@@ -18,15 +18,16 @@ class SecurityServiceImpl(
 ) : SecurityService() {
 
     override fun verifyToken(token: String): Boolean {
-        return try {
+        try {
             val claims = Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.toByteArray()))
                 .build()
                 .parseClaimsJws(token)
 
-            !claims.body.expiration.before(Date())
+            return !claims.body.expiration.before(Date())
         } catch (e: Exception) {
-            false
+            println("Token verification failed: ${e.message}")
+            return false
         }
     }
 

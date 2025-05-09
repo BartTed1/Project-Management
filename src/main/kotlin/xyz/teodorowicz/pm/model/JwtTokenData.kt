@@ -10,7 +10,7 @@ data class JwtTokenClaims(
     companion object {
         fun fromMap(claims: Map<String, Any>): JwtTokenClaims {
             return JwtTokenClaims(
-                userId = claims["userId"] as Long,
+                userId = (claims["userId"] as Number).toLong(),
                 email = claims["email"] as String,
                 role = SystemRole.fromString(claims["role"] as String)
             )

@@ -10,8 +10,8 @@ import xyz.teodorowicz.pm.exception.*
 class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException::class)
-    fun handleUnauthorized(ex: UnauthorizedException):ResponseEntity<Unit> {
-        return ResponseEntity.status(401).body(null)
+    fun handleUnauthorized(ex: UnauthorizedException):ResponseEntity<String> {
+        return ResponseEntity.status(401).body(ex.message)
     }
 
     @ExceptionHandler(BadRequestException::class, IllegalArgumentException::class, ConstraintViolationException::class)
