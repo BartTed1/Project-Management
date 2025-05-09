@@ -41,12 +41,10 @@ interface AuthController {
      *
      * Registration without token is possible only when there are no users in the database.
      *
-     * @param token The JWT token.
      * @param registrationRequest The registration request containing the user's details.
      * @return A response entity containing the registration result.
      */
     fun register(
-        @JwtToken token: JwtTokenData?,
         @RequestBody registrationRequest: RegistrationRequest
     ): ResponseEntity<Response<User?>>
 }

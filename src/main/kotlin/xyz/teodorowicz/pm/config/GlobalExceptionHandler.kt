@@ -29,8 +29,4 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(403).body(ex.message)
     }
 
-    @ExceptionHandler(Exception::class)
-    fun handleInternalServerError(ex: Exception): ResponseEntity<Unit> {
-        return ResponseEntity.status(500).body(null)
-    }
 }

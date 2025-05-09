@@ -81,7 +81,6 @@ class AuthControllerImpl(
         ]
     )
     override fun register(
-        @JwtToken token: JwtTokenData?,
         @RequestBody @Parameter(description = "Registration request") registrationRequest: RegistrationRequest
     ): ResponseEntity<Response<User?>> {
         val user = authService.register(
