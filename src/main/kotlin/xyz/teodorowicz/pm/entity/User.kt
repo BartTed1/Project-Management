@@ -41,11 +41,6 @@ data class User(
     @OneToMany(mappedBy = "user")
     var notifications: MutableList<Notification> = mutableListOf(),
 
-    @OneToMany(
-        mappedBy = "user",
-        cascade = [CascadeType.ALL],
-        orphanRemoval = true,
-        fetch = FetchType.LAZY
-    )
-    var projectMemberships: MutableSet<ProjectMember> = mutableSetOf(),
+    @ManyToMany(mappedBy = "users")
+    var teams: MutableSet<Project> = mutableSetOf()
 )

@@ -11,7 +11,7 @@ import java.time.LocalDate
 data class Project(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = 0,
+    val id: Long? = null,
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
@@ -40,11 +40,12 @@ data class Project(
     @Enumerated(EnumType.STRING)
     var priority: ProjectPriority = ProjectPriority.NORMAL,
 
-    @OneToMany(
-        mappedBy = "project",
-        cascade = [CascadeType.ALL],
-        orphanRemoval = true,
-        fetch = FetchType.LAZY
+    @ManyToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinTable(
+        name = "team_users",
+        joinColumns = [JoinColumn(name = "team_id")],
+        inverseJoinColumns = [JoinColumn(name = "user_id")]
     )
-    var members: MutableSet<ProjectMember> = mutableSetOf()
+    var users: MutableSet<User> = mutableSetOf()
+
 )

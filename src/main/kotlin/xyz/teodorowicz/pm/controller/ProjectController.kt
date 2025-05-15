@@ -1,5 +1,7 @@
 package xyz.teodorowicz.pm.controller
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.query.Param
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
@@ -10,6 +12,7 @@ import xyz.teodorowicz.pm.dto.request.project.AssignUserToProjectRequest
 import xyz.teodorowicz.pm.dto.request.project.CreateProjectRequest
 import xyz.teodorowicz.pm.dto.request.project.UpdateProjectRequest
 import xyz.teodorowicz.pm.entity.Project
+import xyz.teodorowicz.pm.entity.User
 import xyz.teodorowicz.pm.enumeration.SortDirection
 import xyz.teodorowicz.pm.enumeration.project.ProjectPriority
 import xyz.teodorowicz.pm.enumeration.project.ProjectStatus
@@ -56,27 +59,16 @@ interface ProjectController {
     ) : ResponseEntity<Project>
 
     /**
-     * Retrieves a list of projects based on the provided filters.
-     *
+     * Get all projects
      * @param token JWT token
-     * @param query The search query to filter projects by name, description or usernames.
-     * @param page The page number for pagination.
-     * @param size The number of projects per page.
-     * @param status The status of the projects to filter by.
-     * @param priority The priority of the projects to filter by.
-     * @param sortBy The field to sort the projects by.
-     * @param sortDirection The direction to sort the projects (ascending or descending).
+     * @param pageable Pagination information
+     * @return ResponseEntity with a page of users
      */
-    fun listProjects(
+    fun getProjects(
         @JwtToken token: JwtTokenData?,
-        @Param("query") query: String?,
-        @Param("page") page: Int,
-        @Param("size") size: Int,
-        @Param("status") status: ProjectStatus?,
-        @Param("priority") priority: ProjectPriority?,
-        @Param("sortBy") sortBy: String?,
-        @Param("sortDirection") sortDirection: SortDirection?,
-    ) : ResponseEntity<List<Project>>
+        pageable: Pageable
+    ): ResponseEntity<Page<Project>>
+
 
     /**
      * Deletes a project by its ID.

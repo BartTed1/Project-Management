@@ -1,5 +1,7 @@
 package xyz.teodorowicz.pm.controller
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.query.Param
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,15 +17,14 @@ interface UserController {
      * Get all users
      *
      * @param token JWT token
-     * @param page Page number
-     * @param size Page size
-     * @return ResponseEntity with a list of users
+     * @param pageable Pagination information
+     * @return ResponseEntity with a page of users
      */
     fun getUsers(
         @JwtToken token: JwtTokenData?,
-        @Param("page") page: Int,
-        @Param("size") size: Int,
-    ): ResponseEntity<List<User>>
+        pageable: Pageable
+    ): ResponseEntity<Page<User>>
+
 
 
 
@@ -79,4 +80,5 @@ interface UserController {
         @JwtToken token: JwtTokenData?,
         @PathVariable("id") id: Long
     ): ResponseEntity<Unit>
+
 }

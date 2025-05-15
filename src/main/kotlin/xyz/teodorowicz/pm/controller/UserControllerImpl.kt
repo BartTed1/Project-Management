@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -15,6 +17,7 @@ import xyz.teodorowicz.pm.entity.User
 import xyz.teodorowicz.pm.exception.InternalServerErrorException
 import xyz.teodorowicz.pm.exception.NotFoundException
 import xyz.teodorowicz.pm.model.JwtTokenData
+import xyz.teodorowicz.pm.repository.UserRepository
 import xyz.teodorowicz.pm.service.UserService
 import xyz.teodorowicz.pm.enumeration.user.SystemRole as SystemRoleEnum
 
@@ -23,12 +26,13 @@ import xyz.teodorowicz.pm.enumeration.user.SystemRole as SystemRoleEnum
 @Tag(name = "User API", description = "API for user management")
 @CrossOrigin(origins = ["*"])
 class UserControllerImpl(
-    private val userService: UserService
+    private val userService: UserService,
+    private val userRepository: UserRepository
 ) : UserController {
 
 
     @GetMapping
-    @Operation(summary = "Get users", description = "Retrieves a list of users")
+    @Operation(summary = "Get users", description = "Retrieves a paginated list of users")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
@@ -40,17 +44,12 @@ class UserControllerImpl(
         @JwtToken
         token: JwtTokenData?,
 
-        @Parameter(description = "Page number")
-        @RequestParam
-        page: Int,
-
-        @Parameter(description = "Page size")
-        @RequestParam
-        size: Int
-    ): ResponseEntity<List<User>> {
-        try {
-            val users = userService.getUsers(page, size)
-            return ResponseEntity.ok().body(users)
+        @Parameter(description = "Pagination information", example = "page=0&size=10")
+        pageable: Pageable
+    ): ResponseEntity<Page<User>> {
+        return try {
+            val users = userRepository.findAll(pageable)
+            ResponseEntity.ok(users)
         } catch (e: Exception) {
             throw InternalServerErrorException()
         }

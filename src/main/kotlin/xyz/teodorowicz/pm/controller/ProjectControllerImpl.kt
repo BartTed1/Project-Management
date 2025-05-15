@@ -5,7 +5,8 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.data.repository.query.Param
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -19,8 +20,8 @@ import xyz.teodorowicz.pm.enumeration.SortDirection
 import xyz.teodorowicz.pm.enumeration.project.ProjectPriority
 import xyz.teodorowicz.pm.enumeration.project.ProjectStatus
 import xyz.teodorowicz.pm.exception.InternalServerErrorException
-import xyz.teodorowicz.pm.exception.NotFoundException
 import xyz.teodorowicz.pm.model.JwtTokenData
+import xyz.teodorowicz.pm.repository.ProjectRepository
 import xyz.teodorowicz.pm.service.ProjectService
 import xyz.teodorowicz.pm.enumeration.user.SystemRole as SystemRoleEnum
 
@@ -29,7 +30,8 @@ import xyz.teodorowicz.pm.enumeration.user.SystemRole as SystemRoleEnum
 @Tag(name = "Project API", description = "API for project management")
 @CrossOrigin(origins = ["*"])
 class ProjectControllerImpl(
-    private val projectService: ProjectService
+    private val projectService: ProjectService,
+    private val projectRepository: ProjectRepository
 ) : ProjectController {
 
     @PostMapping
@@ -103,49 +105,72 @@ class ProjectControllerImpl(
     }
 
     @GetMapping
-    @Operation(summary = "List projects", description = "Retrieves a list of projects based on the provided filters.")
+    @Operation(summary = "Get projects", description = "Retrieves a paginated project")
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Projects retrieved successfully"),
-            ApiResponse(responseCode = "401", description = "Unauthorized - invalid token"),
-            ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions")
+            ApiResponse(responseCode = "200", description = "project retrieved successfully"),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
         ]
     )
-    override fun listProjects(
-        @Parameter(description = "JWT token")
-        @JwtToken token: JwtTokenData?,
+    override fun getProjects(@Parameter(description = "JWT token")
+     @JwtToken
+     token: JwtTokenData?,
 
-        @Parameter(name = "Search query", description = "Query to filter projects by name, description or usernames")
-        @RequestParam("query")
-        query: String?,
-
-        @Parameter(name = "Page number", description = "Page number for pagination")
-        @RequestParam("page")
-        page: Int,
-
-        @Parameter(name = "Page size", description = "Number of projects per page")
-        @RequestParam("size")
-        size: Int,
-
-        @Parameter(name = "Project status", description = "Status of the projects to filter by")
-        @RequestParam("status")
-        status: ProjectStatus?,
-
-        @Parameter(name = "Project priority", description = "Priority of the projects to filter by")
-        @RequestParam("priority")
-        priority: ProjectPriority?,
-
-        @Parameter(name = "Sort by", description = "Field to sort the projects by")
-        @RequestParam("sortBy")
-        sortBy: String?,
-
-        @Parameter(name = "Sort direction", description = "Direction to sort the projects (ascending or descending)")
-        @RequestParam("sortDirection")
-        sortDirection: SortDirection?,
-    ): ResponseEntity<List<Project>> {
-        val projects = projectService.listProjects(query, page, size, status, priority, sortBy, sortDirection)
-        return ResponseEntity.ok(projects)
+    @Parameter(description = "Pagination information", example = "page=0&size=10")
+     pageable: Pageable
+    ): ResponseEntity<Page<Project>> {
+        return try {
+            val projects = projectRepository.findAll(pageable)
+            ResponseEntity.ok(projects)
+        } catch (e: Exception) {
+            throw InternalServerErrorException()
+        }
     }
+
+//    @GetMapping
+//    @Operation(summary = "List projects", description = "Retrieves a list of projects based on the provided filters.")
+//    @ApiResponses(
+//        value = [
+//            ApiResponse(responseCode = "200", description = "Projects retrieved successfully"),
+//            ApiResponse(responseCode = "401", description = "Unauthorized - invalid token"),
+//            ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions")
+//        ]
+//    )
+//    fun listProjects(
+//        @Parameter(description = "JWT token")
+//        @JwtToken token: JwtTokenData?,
+//
+//        @Parameter(name = "Search query", description = "Query to filter projects by name, description or usernames")
+//        @RequestParam("query")
+//        query: String?,
+//
+//        @Parameter(name = "Page number", description = "Page number for pagination")
+//        @RequestParam("page")
+//        page: Int,
+//
+//        @Parameter(name = "Page size", description = "Number of projects per page")
+//        @RequestParam("size")
+//        size: Int,
+//
+//        @Parameter(name = "Project status", description = "Status of the projects to filter by")
+//        @RequestParam("status")
+//        status: ProjectStatus?,
+//
+//        @Parameter(name = "Project priority", description = "Priority of the projects to filter by")
+//        @RequestParam("priority")
+//        priority: ProjectPriority?,
+//
+//        @Parameter(name = "Sort by", description = "Field to sort the projects by")
+//        @RequestParam("sortBy")
+//        sortBy: String?,
+//
+//        @Parameter(name = "Sort direction", description = "Direction to sort the projects (ascending or descending)")
+//        @RequestParam("sortDirection")
+//        sortDirection: SortDirection?,
+//    ): ResponseEntity<List<Project>> {
+//        val projects = projectService.listProjects(query, page, size, status, priority, sortBy, sortDirection)
+//        return ResponseEntity.ok(projects)
+//    }
 
     @DeleteMapping("/{projectId}")
     @Operation(summary = "Delete a project", description = "Deletes the project with the specified ID.")

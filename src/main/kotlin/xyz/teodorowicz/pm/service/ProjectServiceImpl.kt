@@ -39,8 +39,9 @@ class ProjectServiceImpl(
             plannedStartDate = request.plannedStartDate ?: LocalDate.now(),
             plannedEndDate = request.plannedEndDate,
             owner = user,
-            members = mutableSetOf(),
+            users = mutableSetOf(user)
         )
+        println(project.toString())
         return projectRepository.save(project)
     }
 
@@ -127,23 +128,23 @@ class ProjectServiceImpl(
     }
 
     override fun deleteProjectRole(token: JwtTokenData?, projectId: String, roleName: String) {
-        val project = projectRepository.findById(projectId)
-            .orElseThrow { NotFoundException("Project not found: $projectId") }
-
-        val existingRole = project.roles.contains(roleName)
-        if (!existingRole) {
-            throw IllegalArgumentException("Role does not exist in the project")
-        }
-
-        val isAnyUserHasRole = project.members.any { it.role == roleName }
-        if (isAnyUserHasRole) {
-            throw IllegalArgumentException("Cannot delete role that is assigned to users. Remove users from this role first.")
-        }
-
-        val updatedProject = project.copy(
-            roles = project.roles.minus(roleName),
-        )
-        projectRepository.save(updatedProject)
+//        val project = projectRepository.findById(projectId)
+//            .orElseThrow { NotFoundException("Project not found: $projectId") }
+//
+//        val existingRole = project.roles.contains(roleName)
+//        if (!existingRole) {
+//            throw IllegalArgumentException("Role does not exist in the project")
+//        }
+//
+//        val isAnyUserHasRole = project.members.any { it.role == roleName }
+//        if (isAnyUserHasRole) {
+//            throw IllegalArgumentException("Cannot delete role that is assigned to users. Remove users from this role first.")
+//        }
+//
+//        val updatedProject = project.copy(
+//            roles = project.roles.minus(roleName),
+//        )
+//        projectRepository.save(updatedProject)
     }
 
     override fun assignUsersToProject(token: JwtTokenData?, projectId: String, request: AssignUserToProjectRequest) {
@@ -152,16 +153,15 @@ class ProjectServiceImpl(
 
         val users = userRepository.findAllById(request.userId)
 
-        val newMembers = users.map { user ->
-            ProjectMember(
-                user = user,
-                project = project,
-                role = request.role
-            )
-        }
+//        val newMembers = users.map { user ->
+//            ProjectMember(
+//                user = user,
+//                project = project
+//            )
+//        }
 
         val updatedProject = project.copy(
-            members = (project.members + newMembers).toMutableSet()
+            users = (project.users + users).toMutableSet()
         )
 
         projectRepository.save(updatedProject)
@@ -171,15 +171,15 @@ class ProjectServiceImpl(
         val project = projectRepository.findById(projectId)
             .orElseThrow { NotFoundException("Project not found: $projectId") }
 
-        val membersToRemove = project.members.filter { it.user.id in userIds }
+        val membersToRemove = project.users.filter { it.id in userIds }
         if (membersToRemove.isEmpty()) {
             throw IllegalArgumentException("No users found in the project with the provided IDs")
         }
 
-        val updatedMembers = project.members.filter { it.user.id !in userIds }.toMutableSet()
+        val updatedMembers = project.users.filter { it.id !in userIds }.toMutableSet()
 
         val updatedProject = project.copy(
-            members = updatedMembers
+            users = updatedMembers
         )
 
         projectRepository.save(updatedProject)
