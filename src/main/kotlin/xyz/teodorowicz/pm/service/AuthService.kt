@@ -36,27 +36,11 @@ abstract class AuthService {
     ): User
 
 
-
     /**
-     * Reset the password of the user with the provided email.
+     * Check if any user is registered.
      *
-     * @param email The email of the user.
-     * @param password The new password of the user.
-     * @return The updated user.
+     * This is used to determine if registration is open or closed.
+     * @return true if any user is registered, false otherwise.
      */
-    abstract fun resetPassword(
-        email: String,
-        password: String,
-    ): User
-
-
-
-    /**
-     * Initiate the password reset process for the user with the provided email.
-     *
-     * @param email The email of the user.
-     */
-    abstract fun initiatePasswordReset(
-        email: String
-    )
+    abstract fun isAnyUserRegistered(): Boolean
 }

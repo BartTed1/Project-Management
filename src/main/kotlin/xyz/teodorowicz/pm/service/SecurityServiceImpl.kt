@@ -18,15 +18,16 @@ class SecurityServiceImpl(
 ) : SecurityService() {
 
     override fun verifyToken(token: String): Boolean {
-        return try {
+        try {
             val claims = Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.toByteArray()))
                 .build()
                 .parseClaimsJws(token)
 
-            !claims.body.expiration.before(Date())
+            return !claims.body.expiration.before(Date())
         } catch (e: Exception) {
-            false
+            println("Token verification failed: ${e.message}")
+            return false
         }
     }
 
@@ -42,6 +43,7 @@ class SecurityServiceImpl(
             .setSubject(user.id.toString())
             .setIssuedAt(now)
             .setExpiration(expiryDate)
+            .claim("userId", user.id)
             .claim("email", user.email)
             .claim("role", user.role)
             .signWith(Keys.hmacShaKeyFor(jwtSecret.toByteArray()))
@@ -50,6 +52,23 @@ class SecurityServiceImpl(
 
     override fun hashPassword(password: String): String {
         return bCryptPasswordEncoder.encode(password)
+    }
+
+    override fun getTokenClaims(token: String): Map<String, Any> {
+        val claims = Jwts.parserBuilder()
+            .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.toByteArray()))
+            .build()
+            .parseClaimsJws(token)
+            .body
+        return claims
+    }
+
+    override fun getRoleFromToken(token: String): String {
+        return try {
+            getTokenClaims(token)["role"] as String
+        } catch (e: Exception) {
+            throw RuntimeException("Invalid token")
+        }
     }
 
     /* TODO: implement token revoking */

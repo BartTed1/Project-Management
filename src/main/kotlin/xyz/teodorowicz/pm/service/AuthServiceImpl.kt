@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service
 import xyz.teodorowicz.pm.entity.User
 import xyz.teodorowicz.pm.exception.UnauthorizedException
 import xyz.teodorowicz.pm.exception.BadRequestException
-import xyz.teodorowicz.pm.exception.NotFoundException
 import xyz.teodorowicz.pm.repository.UserRepository
 
 @Service
@@ -42,24 +41,12 @@ class AuthServiceImpl(
             name = "$firstName $lastName",
             email = email,
             password = hashedPassword,
-            role = "USER"
         )
 
         return userRepository.save(user)
     }
 
-    override fun resetPassword(email: String, password: String): User {
-        val user = userRepository.findByEmail(email)
-            ?: throw NotFoundException("Nie znaleziono użytkownika o podanym adresie email")
-
-        val hashedPassword = securityService.hashPassword(password)
-
-        /* TODO: that do nothing, implement */
-        val updatedUser = user.copy(password = hashedPassword)
-        return userRepository.save(updatedUser)
-    }
-
-    override fun initiatePasswordReset(email: String) {
-        return
+    override fun isAnyUserRegistered(): Boolean {
+        return userRepository.count() != 0L
     }
 }

@@ -4,6 +4,14 @@ import xyz.teodorowicz.pm.entity.User
 
 abstract class SecurityService {
     /**
+     * Parse the JWT token and return its claims.
+     *
+     * @param token The JWT token to parse.
+     * @return Map of claims from the token.
+     */
+    internal abstract fun getTokenClaims(token: String): Map<String, Any>
+
+    /**
      * Verify the provided JWT token.
      *
      * @param token The JWT token to verify.
@@ -39,4 +47,14 @@ abstract class SecurityService {
      * @param password The plain text password to hash.
      */
     internal abstract fun hashPassword(password: String): String
+
+
+
+    /**
+     * Get role from token.
+     *
+     * @param token The JWT token to verify.
+     * @return The role of the user.
+     */
+    abstract fun getRoleFromToken(token: String): String
 }

@@ -1,34 +1,48 @@
 package xyz.teodorowicz.pm.entity
 
+import com.fasterxml.jackson.annotation.*
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "teams")
-data class Team(
+@Table(name = "team")
+data class Team (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int = 0,
-    
-    val name: String,
-    
-    val description: String? = null,
-    
+    val id: Long = 0,
+
+    @Column(nullable = false)
+    var name: String = "",
+
+    @Column
+    var description: String = "",
+
     @ManyToOne
-    @JoinColumn(name = "ownerId")
-    val owner: User,
-    
+    @JoinColumn(name = "owner_id", nullable = false)
+    @JsonIgnoreProperties(value = ["ownedTeams", "teams", "password"])
+    var owner: User,
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_team",
+        joinColumns = [JoinColumn(name = "team_id")],
+        inverseJoinColumns = [JoinColumn(name = "user_id")]
+    )
+    @JsonIgnoreProperties(value = ["ownedTeams", "teams", "password"])
+    var users: MutableList<User> = mutableListOf(),
+
     @OneToMany(mappedBy = "team")
-    val tasks: MutableList<Task> = mutableListOf(),
-    
+    @JsonBackReference("team")
+    var tasks: MutableList<Task> = mutableListOf(),
+
     @OneToMany(mappedBy = "team")
-    val files: MutableList<File> = mutableListOf(),
-    
+    @JsonBackReference("team")
+    var files: MutableList<File> = mutableListOf(),
+
     @OneToMany(mappedBy = "team")
-    val messages: MutableList<Message> = mutableListOf(),
-    
+    @JsonBackReference("team")
+    var messages: MutableList<Message> = mutableListOf(),
+
     @OneToMany(mappedBy = "team")
-    val notifications: MutableList<Notification> = mutableListOf(),
-    
-    @ManyToMany(mappedBy = "teams")
-    val users: MutableList<User> = mutableListOf()
+    @JsonBackReference("team")
+    var notifications: MutableList<Notification> = mutableListOf()
 )

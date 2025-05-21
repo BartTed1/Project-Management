@@ -6,9 +6,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-import xyz.teodorowicz.pm.dto.request.LoginRequest
-import xyz.teodorowicz.pm.dto.request.RegistrationRequest
+import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import xyz.teodorowicz.pm.annotation.JwtToken
+import xyz.teodorowicz.pm.model.JwtTokenData
+import xyz.teodorowicz.pm.dto.request.auth.LoginRequest
+import xyz.teodorowicz.pm.dto.request.auth.RegistrationRequest
 import xyz.teodorowicz.pm.dto.response.LoginResponse
 import xyz.teodorowicz.pm.dto.response.Response
 import xyz.teodorowicz.pm.entity.User
@@ -18,6 +25,7 @@ import xyz.teodorowicz.pm.service.SecurityService
 @RestController
 @RequestMapping("auth")
 @Tag(name = "Authentication API", description = "API for user authentication")
+@CrossOrigin(origins = ["*"])
 class AuthControllerImpl(
     private val authService: AuthService,
     private val securityService: SecurityService
@@ -32,19 +40,10 @@ class AuthControllerImpl(
         ]
     )
     override fun verifyToken(
-        @Parameter(description = "Authorization header with Bearer token")
-        @RequestHeader("Authorization") authorizationHeader: String
-    ): ResponseEntity<Response<Boolean>> {
-        val token = authorizationHeader.replace("Bearer ", "")
-        val isValid = securityService.verifyToken(token)
-
-        return ResponseEntity.ok(
-            Response(
-                status = 200,
-                message = if (isValid) "Token ważny" else "Token nieważny",
-                data = isValid
-            )
-        )
+        @Parameter(description = "JWT token")
+        @JwtToken token: JwtTokenData
+    ): ResponseEntity<Boolean> {
+        return ResponseEntity.ok(true)
     }
 
     @PostMapping("/login")
@@ -83,7 +82,7 @@ class AuthControllerImpl(
     )
     override fun register(
         @RequestBody @Parameter(description = "Registration request") registrationRequest: RegistrationRequest
-    ): ResponseEntity<Response<User>> {
+    ): ResponseEntity<Response<User?>> {
         val user = authService.register(
             email = registrationRequest.email,
             password = registrationRequest.password,
