@@ -1,6 +1,9 @@
 package xyz.teodorowicz.pm.entity
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import jakarta.persistence.*
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 
 @Entity
@@ -8,32 +11,42 @@ import java.time.LocalDateTime
 data class Task(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
-    
+    val id: Int = 0,
+
+    @Column(nullable = false)
     var title: String,
-    
+
     var description: String? = null,
-    
+
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @Column(nullable = false)
+    @UpdateTimestamp
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
+
+    @Column(nullable = false)
+    var deadline: LocalDateTime,
+
+    var endAt: LocalDateTime? = null,
+
+    @Column(nullable = false)
+    var status: String = "DURING",
+
+    @Column(nullable = false)
+    var priority: String = "MEDIUM",
+
+    @Column(nullable = false)
+    var reminder: String = "NONE",
+
     @ManyToOne
-    @JoinColumn(name = "projectId")
-    val project: Project,
-    
-    @ManyToOne
+    @JsonBackReference("tasks")
     @JoinColumn(name = "userId")
     var user: User? = null,
-    
-    @Column(nullable = false, updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
-    
-    var updatedAt: LocalDateTime = LocalDateTime.now(),
-    
-    var deadline: LocalDateTime,
-    
-    var endAt: LocalDateTime? = null,
-    
-    val status: String = "DURING",
-    
-    val priority: String = "MEDIUM",
-    
-    val reminder: String = "NONE"
+
+    @ManyToOne
+    @JsonBackReference("tasks")
+    @JoinColumn(name = "teamId")
+    var team: Team? = null
 )

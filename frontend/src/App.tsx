@@ -6,6 +6,11 @@ import Register from './pages/Register';
 import NavigationBar from './components/NavigationBar';
 import { verify } from './connection';
 import Settings from './pages/Settings';
+import Users from './pages/Users';
+import Teams from './pages/Teams';
+import OwnTeams from './pages/OwnTeams';
+import Addteams from './pages/AddTeams';
+import Team from './pages/Team';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -45,7 +50,14 @@ function App() {
       <Router>
         <NavigationBar />
         <Routes>
+          <Route path='/' element={<h1>Home</h1>} />
           <Route path='settings' element={<Settings />} /> 
+          <Route path='users' element={<Users />} /> 
+          <Route path='teams' element={<Teams />} />
+          <Route path='own-teams' element={<OwnTeams />} />
+          <Route path='addteams' element={<Addteams />} />
+          <Route path='teams/:id' element={<Team />} />
+          <Route path='*' element={<h1>404 Not Found</h1>} />
         </Routes>
       </Router>
     </>

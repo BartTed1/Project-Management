@@ -1,6 +1,8 @@
 package xyz.teodorowicz.pm.entity
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import jakarta.persistence.*
+import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDateTime
 
 @Entity
@@ -11,15 +13,18 @@ data class Message(
     val id: Long = 0,
     
     val content: String,
+
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    val createdAt: LocalDateTime = LocalDateTime.now(),
     
     @ManyToOne
+    @JsonBackReference("messages")
     @JoinColumn(name = "userId")
     val user: User,
     
     @ManyToOne
-    @JoinColumn(name = "projectId")
-    val project: Project,
-    
-    @Column(nullable = false, updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    @JsonBackReference("messages")
+    @JoinColumn(name = "teamId")
+    val team: Team
 )
