@@ -198,11 +198,11 @@ class TeamControllerImp(
         if(user.role==SystemRole.USER && team.get().owner!=user)
             return ResponseEntity.status(403).build()
 
-        if(team.get().users.contains(user)) return ResponseEntity.status(403).build()
-
         val userAdd = userRepository.findByEmail(userEmail)
         println(userEmail)
         if(userAdd == null) return ResponseEntity.notFound().build()
+
+        if(team.get().users.contains(userAdd)) return ResponseEntity.status(403).build()
 
         team.get().users.add(userAdd)
         teamRepository.save(team.get())
