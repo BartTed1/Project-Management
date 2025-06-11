@@ -210,7 +210,7 @@ class TeamControllerImp(
         return ResponseEntity.ok().build()
     }
 
-    @DeleteMapping("/{teamId}/users")
+    @DeleteMapping("/{teamId}/users/{userId}")
     @Operation(summary = "Remove users from a team", description = "Removes the specified users from the team.")
     @ApiResponses(
         value = [
@@ -228,7 +228,7 @@ class TeamControllerImp(
         @PathVariable teamId: String,
 
         @Parameter(name = "User ID", description = " user ID to be removed from the project")
-        @RequestBody userIds: Long
+        @PathVariable userId: String
     ): ResponseEntity<Unit> {
         val team = teamRepository.findById(teamId)
         if(team.isEmpty) return ResponseEntity.notFound().build()
@@ -238,7 +238,7 @@ class TeamControllerImp(
         if(user.role==SystemRole.USER && team.get().owner!=user)
             return ResponseEntity.status(403).build()
 
-        val userRemove = userRepository.findById(userIds)
+        val userRemove = userRepository.findById(userId.toLong())
             .orElseThrow { IllegalArgumentException("User not found") }
 
         if(!team.get().users.contains(userRemove)) return ResponseEntity.notFound().build()

@@ -53,9 +53,6 @@ const Login = () => {
             <Button variant="primary" type="submit" className="w-100 mt-4">
               Zaloguj
             </Button>
-            <Button variant="secondary" className="w-100 mt-4" href="/register">
-              Zarejestruj się
-            </Button>
           </Form>
         </Col>
       </Row>

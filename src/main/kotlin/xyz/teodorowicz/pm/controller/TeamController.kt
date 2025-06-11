@@ -98,6 +98,6 @@ interface TeamController {
     fun removeUserFromTeamt(
         @JwtToken token: JwtTokenData,
         @PathVariable("projectId") teamId: String,
-        @RequestBody userIds: Long
+        @PathVariable userId: String
     ) : ResponseEntity<Unit>
 }

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Table, Container, Pagination, Alert} from 'react-bootstrap'
-import { getUsers } from '../connection';
-
+import { deleteUser, getUsers, resetPassword } from '../connection';
 import infoIcon from '../assets/info.svg';
 import deleteIcon from '../assets/delete.svg';
+import restoreIcon from '../assets/restore.svg';
 import editIcon from '../assets/edit.svg';
 import '../style/table.css';
 
@@ -14,20 +14,13 @@ const Users = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const sortBy = urlParams.get('sortBy') || 'id'; 
     const sortOrder = urlParams.get('sortOrder') || 'asc';
-    const page = parseInt(urlParams.get('page') || '0', 10);
+    const page = parseInt(urlParams.get('page') || '1', 10);
     const pageSize = parseInt(urlParams.get('pageSize') || '10', 10);
 
     useEffect(() => {
         const fetchUsers = async () => {
             const data = await getUsers(pageSize, page, sortBy, sortOrder);
-            if(!data){
-                setAlertMsg({
-                    variant: 'danger',
-                    msg: 'Coś poszło nie tak przy próbie pobrania użytkowników'
-                });
-                return;
-            }
-            setData(data);
+            setData(data);  
             if(page > data.totalPages && data.totalPages > 0){
                 urlParams.set('page', '1');
                 window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}`);
@@ -88,24 +81,41 @@ const Users = () => {
     }
 
     const handleDelete = async (id: number) => {
-        // if(window.confirm('Czy na pewno chcesz usunąć użytkownika?')){
-        //     if(await deleteUser(id.toString())){
-        //         setAlertMsg({
-        //             variant: 'success',
-        //             msg: 'pomyślnie usunięto użytkownika'
-        //         });
-        //         const newData = {
-        //             ...data,
-        //             users: data.users.filter((user: any) => user.id !== id)
-        //         };
-        //         setData(newData);
-        //     }else{
-        //         setAlertMsg({
-        //             variant: 'danger',
-        //             msg: 'Coś poszło nie tak przy próbie usunięcia użytkownika'
-        //         });
-        //     }
-        // }
+        if(window.confirm('Czy na pewno chcesz usunąć użytkownika?')){
+            if(await deleteUser(id.toString())){
+                setAlertMsg({
+                    variant: 'success',
+                    msg: 'pomyślnie usunięto użytkownika'
+                });
+                const newData = {
+                    ...data,
+                    users: data.users.filter((user: any) => user.id !== id)
+                };
+                setData(newData);
+            }else{
+                setAlertMsg({
+                    variant: 'danger',
+                    msg: 'Coś poszło nie tak przy próbie usunięcia użytkownika'
+                });
+            }
+        }
+    }
+
+    const handleRestore = async (id: number) => {
+        if(window.confirm('Czy na pewno chcesz zresetować hasło użytkownika?')){
+            const password = await resetPassword(id.toString())
+            if(password){
+                setAlertMsg({
+                    variant: 'success',
+                    msg: `pomyślnie zresetowano hasło użytkownika nowe hasło to: ${password}`
+                });
+            }else{
+                setAlertMsg({
+                    variant: 'danger',
+                    msg: 'Coś poszło nie tak przy próbie zresetowania hasła użytkownika'
+                });
+            }
+        }
     }
 
     if(!data)return <></>;
@@ -140,6 +150,7 @@ const Users = () => {
                                         {((userLogged.role != 'USER' && user.role == 'USER') || (userLogged.role == 'SUPERADMIN' && user.role == 'ADMIN')) &&
                                             <>
                                                 <img src={deleteIcon} alt='del' width='20px' title='usuń' className='icon' onClick={() => handleDelete(user.id)} />
+                                                <img src={restoreIcon} alt='res' width='20px' title='zresetuj hasło' className='icon' onClick={() => handleRestore(user.id)}  />
                                                 <a href={`/users/${user.id}/edit`}><img src={editIcon} alt='edit' width='20px' title='edytuj' /></a>
                                             </>
                                         }
