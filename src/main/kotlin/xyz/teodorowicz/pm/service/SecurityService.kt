@@ -57,4 +57,12 @@ abstract class SecurityService {
      * @return The role of the user.
      */
     abstract fun getRoleFromToken(token: String): String
+
+    /**
+     * Parse the JWT token and return token data.
+     *
+     * @param token The JWT token to parse.
+     * @return The parsed JWT token data.
+     */
+    abstract fun parseJwtToken(token: String): xyz.teodorowicz.pm.model.JwtTokenData
 }

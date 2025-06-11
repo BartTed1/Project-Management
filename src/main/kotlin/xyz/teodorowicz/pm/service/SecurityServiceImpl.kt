@@ -71,5 +71,11 @@ class SecurityServiceImpl(
         }
     }
 
+    override fun parseJwtToken(token: String): xyz.teodorowicz.pm.model.JwtTokenData {
+        val claims = getTokenClaims(token)
+        val jwtTokenClaims = xyz.teodorowicz.pm.model.JwtTokenClaims.fromMap(claims)
+        return xyz.teodorowicz.pm.model.JwtTokenData(jwtTokenClaims, token)
+    }
+
     /* TODO: implement token revoking */
 }
