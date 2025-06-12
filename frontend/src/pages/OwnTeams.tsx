@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { deleteTeam, getUser } from "../connection";
+import { getUser, deleteTeam } from "../connection";
 import { Table, Container, Alert } from "react-bootstrap";
 import '../style/table.css';
 import infoIcon from '../assets/info.svg';
@@ -28,7 +28,7 @@ const OwnTeams = () => {
                 });
                 const newData = {
                     ...data,
-                    teams: data.teams.filter((team: any) => team.team.id != id)
+                    teams: data.teams.filter((team: any) => team.id != id)
                 };
                 setData(newData);
             }else{
@@ -62,18 +62,18 @@ const OwnTeams = () => {
                         </thead>
                         <tbody>
                             {data.teams.map((team: any) => (
-                                <tr key={team.team.id}>
-                                    <td>{team.team.id}</td>
-                                    <td>{team.team.name}</td>
-                                    <td>{team.team.description}</td>
-                                    <td>{team.team.owner.name}</td>
-                                    <td>{team.team.owner.email}</td>
+                                <tr key={team.id}>
+                                    <td>{team.id}</td>
+                                    <td>{team.name}</td>
+                                    <td>{team.description}</td>
+                                    <td>{team.owner.name}</td>
+                                    <td>{team.owner.email}</td>
                                     <td>
-                                        <a href={`/teams/${team.team.id}`}><img src={infoIcon} alt='info' width='20px' title='szczegóły' /></a>
-                                        {team.team.owner.id == userLogged.id &&
+                                        <a href={`/teams/${team.id}`}><img src={infoIcon} alt='info' width='20px' title='szczegóły' /></a>
+                                        {team.owner.id == userLogged.id &&
                                             <>
-                                                <img src={deleteIcon} alt='del' width='20px' title='usuń' className='icon' onClick={() => handleDelete(team.team.id)} />
-                                                <a href={`/teams/${team.team.id}/edit`}><img src={editIcon} alt='edit' width='20px' title='edytuj' /></a>
+                                                <img src={deleteIcon} alt='del' width='20px' title='usuń' className='icon' onClick={() => handleDelete(team.id)} />
+                                                <a href={`/teams/${team.id}/edit`}><img src={editIcon} alt='edit' width='20px' title='edytuj' /></a>
                                             </>
                                         }
                                     </td>

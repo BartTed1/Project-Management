@@ -4,7 +4,6 @@ import { getTeam, updateTeam } from "../connection";
 import { Alert, Container, Row, Form, Button, Col } from "react-bootstrap";
 
 const EditTeams = () => {
-    // const userLogged = JSON.parse(localStorage.getItem('user') as string);
     const { id } = useParams<{ id: string }>();
     const [team, setTeam] = useState(null as any)
     const [error, setError] = useState('');

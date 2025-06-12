@@ -1,19 +1,13 @@
 import React from 'react';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap';
-import { changeName as changeNameConn, changePassword as changePasswordConn } from '../connection';
 
 const Settings = () => {
   const user = JSON.parse(localStorage.getItem('user') as string);
 
   const changeName = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const name = (e.currentTarget.elements[0] as HTMLInputElement).value;
-    if(await changeNameConn(name)){
-        alert('Zmieniono nazwę konta');
-        location.reload();
-    }else{
-        alert('Coś poszło nie tak');
-    }
+    const name = (e.currentTarget.elements[2] as HTMLInputElement).value;
+    alert(name);
   }
 
   const changePassword = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -25,23 +19,30 @@ const Settings = () => {
         alert('Hasła nie są takie same');
         return;
     }
-    if(await changePasswordConn(oldPassword, newPassword)){
-        alert('Zmieniono hasło');
-        location.reload();
-    }else{
-        alert('hasło niepoprawne');
-    }
+    alert(oldPassword + newPassword + newPassword2);
   }
 
   return (
     <Container>
       <h1 className="my-4">Ustawienia konta</h1>
       <Form onSubmit={changeName}>
-        <h2 className="my-3">Nazwa konta</h2>
-        <Form.Group as={Row} controlId="formName">
+        <h2 className="my-3">Dane konta:</h2>
+        <Form.Group as={Row}>
+          <Form.Label column sm={2}>Email:</Form.Label>
+          <Col sm={10}>
+            <Form.Control type="email" value={user.email} readOnly />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row} className="my-3">
+          <Form.Label column sm={2}>Rola:</Form.Label>
+          <Col sm={10}>
+            <Form.Control type="text" value={user.role} readOnly />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row} className="my-3">
           <Form.Label column sm={2}>Nazwa:</Form.Label>
           <Col sm={10}>
-            <Form.Control type="text" placeholder={user.name} required />
+            <Form.Control type="text" defaultValue={user.name} required />
           </Col>
         </Form.Group>
         <Button variant="primary" type="submit" className="my-3">Zapisz</Button>

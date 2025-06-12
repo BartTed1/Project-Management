@@ -8,7 +8,7 @@ const Teams = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const sortBy = urlParams.get('sortBy') || 'id'; 
     const sortOrder = urlParams.get('sortOrder') || 'asc';
-    const page = parseInt(urlParams.get('page') || '1', 10);
+    const page = parseInt(urlParams.get('page') || '0', 10);
     const pageSize = parseInt(urlParams.get('pageSize') || '10', 10);
     const userLogged = JSON.parse(localStorage.getItem('user') as string)
 
@@ -16,6 +16,9 @@ const Teams = () => {
         const fetchUsers = async () => {
             const data = await getTeams(pageSize, page, sortBy, sortOrder);
             setData(data);  
+            if(data === null){
+                return;
+            }
             if(page > data.totalPages && data.totalPages > 0){
                 urlParams.set('page', '1');
                 window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}`);
