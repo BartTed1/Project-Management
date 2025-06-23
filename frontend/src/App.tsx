@@ -14,6 +14,7 @@ import Team from './pages/Team';
 import Home from './pages/Home';
 import User from './pages/User';
 import EditTeams from './pages/EditTeams';
+import Chat from "./pages/Chat";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -63,6 +64,7 @@ function App() {
           <Route path='teams/:id/edit' element={<EditTeams />} />
           <Route path='teams/:id' element={<Team />} />
           <Route path='*' element={<h1>404 Not Found</h1>} />
+          <Route path='/teams/:id/chat' element={<Chat userId={0} teamId={0} />} />
         </Routes>
       </Router>
     </>

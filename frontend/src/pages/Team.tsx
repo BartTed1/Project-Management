@@ -5,6 +5,7 @@ import { Alert, Card, Col, Container, Row, Tab, Table, Tabs, Form, Button } from
 import infoIcon from '../assets/info.svg';
 import deleteIcon from '../assets/delete.svg';
 import editIcon from '../assets/edit.svg';
+import ChatBox from "../components/ChatBox";
 
 const Team = () => {
     const [alertMsg, setAlertMsg] = useState(null as any);
@@ -175,7 +176,7 @@ const Team = () => {
                             </Tab>
                             <Tab eventKey="message" title="Czat">
                                 <Card.Body>
-                                    My decydujemy tylko o tym jak wykorzystać czas, który nam dano.
+                                    <ChatBox teamId={Number(id)} userId={userLogged.id} />
                                 </Card.Body>
                             </Tab>
                         </Tabs>
