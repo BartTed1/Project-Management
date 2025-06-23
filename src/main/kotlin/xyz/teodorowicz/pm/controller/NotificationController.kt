@@ -42,24 +42,24 @@ class NotificationController(
         return ResponseEntity.ok(count)
     }
 
-    @PutMapping("/{id}/read")
-    fun markAsRead(
-        @PathVariable id: Long,
-        @JwtToken tokenData: JwtTokenData
-    ): ResponseEntity<Response> {
-        val success = notificationService.markAsRead(id, tokenData.claims.userId)
-        return if (success) {
-            ResponseEntity.ok(Response("Notification marked as read"))
-        } else {
-            ResponseEntity.notFound().build()
-        }
-    }
-
-    @PutMapping("/read-all")
-    fun markAllAsRead(
-        @JwtToken tokenData: JwtTokenData
-    ): ResponseEntity<Response> {
-        val success = notificationService.markAllAsRead(tokenData.claims.userId)
-        return ResponseEntity.ok(Response("All notifications marked as read"))
-    }
+//    @PutMapping("/{id}/read")
+//    fun markAsRead(
+//        @PathVariable id: Long,
+//        @JwtToken tokenData: JwtTokenData
+//    ): ResponseEntity<Response> {
+//        val success = notificationService.markAsRead(id, tokenData.claims.userId)
+//        return if (success) {
+//            ResponseEntity.ok(Response("Notification marked as read"))
+//        } else {
+//            ResponseEntity.notFound().build()
+//        }
+//    }
+//
+//    @PutMapping("/read-all")
+//    fun markAllAsRead(
+//        @JwtToken tokenData: JwtTokenData
+//    ): ResponseEntity<Response> {
+//        val success = notificationService.markAllAsRead(tokenData.claims.userId)
+//        return ResponseEntity.ok(Response("All notifications marked as read"))
+//    }
 }

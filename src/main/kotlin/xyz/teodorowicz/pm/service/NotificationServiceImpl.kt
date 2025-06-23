@@ -27,7 +27,7 @@ class NotificationServiceImpl(
         val user = userRepository.findById(userId)
             .orElseThrow { IllegalArgumentException("User not found with id: $userId") }
         
-        val team = teamRepository.findById(teamId)
+        val team = teamRepository.findById(teamId.toString())
             .orElseThrow { IllegalArgumentException("Team not found with id: $teamId") }
 
         val notification = Notification(
