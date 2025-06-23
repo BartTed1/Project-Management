@@ -248,7 +248,6 @@ class TeamControllerImp(
         teamRepository.save(team.get())
 
         return ResponseEntity.ok().build()
-        // TODO naprawić
     }
 
 }
