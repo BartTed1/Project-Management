@@ -1,17 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getTeam, addTeamMember  } from "../connection";
+import { getTeam, addTeamMember, deleteTeam, removeTeamMember  } from "../connection";
 import { Alert, Card, Col, Container, Row, Tab, Table, Tabs, Form, Button } from "react-bootstrap";
 import infoIcon from '../assets/info.svg';
 import deleteIcon from '../assets/delete.svg';
 import editIcon from '../assets/edit.svg';
-import checkIcon from '../assets/check.svg';
-import cancelIcon from '../assets/cancel.svg';
-import downloadIcon from '../assets/download.svg';
-import Status from "../components/Status";
-import Priority from "../components/Priority";
-import DateTime from "../components/DateTime";
-import { format } from 'date-fns';
+import ChatBox from "../components/ChatBox";
 
 const Team = () => {
     const [alertMsg, setAlertMsg] = useState(null as any);
@@ -35,20 +29,20 @@ const Team = () => {
     
 
     const handleDelete = async (id: number) => {
-        // if(window.confirm('Czy na pewno chcesz usunąć zespół?')){
-        //     if(await deleteTeam(id.toString())){
-        //         setAlertMsg({
-        //             variant: 'success',
-        //             msg: 'pomyślnie usunięto zespół'
-        //         });
-        //         setData(null);
-        //     }else{
-        //         setAlertMsg({
-        //             variant: 'danger',
-        //             msg: 'Coś poszło nie tak przy próbie usunięcia zespołu'
-        //         });
-        //     }
-        // }
+        if(window.confirm('Czy na pewno chcesz usunąć zespół?')){
+            if(await deleteTeam(id.toString())){
+                setAlertMsg({
+                    variant: 'success',
+                    msg: 'pomyślnie usunięto zespół'
+                });
+                setData(null);
+            }else{
+                setAlertMsg({
+                    variant: 'danger',
+                    msg: 'Coś poszło nie tak przy próbie usunięcia zespołu'
+                });
+            }
+        }
     }
 
     const addUser = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -61,21 +55,21 @@ const Team = () => {
     }
 
     const handleDeleteUser = async (userId: number) => {
-        // if(window.confirm('Czy na pewno chcesz usunąć użytkownika z zespołu?')){
-        //     if(await removeTeamUser(id as string, userId)){
-        //         setUserAlertMsg({
-        //             variant: 'success',
-        //             msg: 'pomyślnie usunięto użytkownika z zespołu'
-        //         });
-        //         const data = await getTeam(id as string);
-        //         setData(data);
-        //     }else{
-        //         setUserAlertMsg({
-        //             variant: 'danger',
-        //             msg: 'Coś poszło nie tak przy próbie usunięcia użytkownika z zespołu'
-        //         });
-        //     }
-        // }
+        if(window.confirm('Czy na pewno chcesz usunąć użytkownika z zespołu?')){
+            if(await removeTeamMember(id as string, userId.toString())){
+                setUserAlertMsg({
+                    variant: 'success',
+                    msg: 'pomyślnie usunięto użytkownika z zespołu'
+                });
+                const data = await getTeam(id as string);
+                setData(data);
+            }else{
+                setUserAlertMsg({
+                    variant: 'danger',
+                    msg: 'Coś poszło nie tak przy próbie usunięcia użytkownika z zespołu'
+                });
+            }
+        }
     }
 
 
@@ -155,7 +149,7 @@ const Team = () => {
                                                         <td>
                                                             <a href={`/users/${user.id}`}><img src={infoIcon} alt='info' width='20px' title='szczegóły' /></a>
                                                             {userLogged.id === data.owner.id && user.id != userLogged.id && (
-                                                                <img src={deleteIcon} alt='del' width='20px' title='usuń' className='icon' onClick={() => handleDeleteUser(user.user.id)}/>   
+                                                                <img src={deleteIcon} alt='del' width='20px' title='usuń' className='icon' onClick={() => handleDeleteUser(user.id)}/>   
                                                             )}
                                                         </td>
                                                     </tr>
@@ -182,7 +176,7 @@ const Team = () => {
                             </Tab>
                             <Tab eventKey="message" title="Czat">
                                 <Card.Body>
-                                    My decydujemy tylko o tym jak wykorzystać czas, który nam dano.
+                                    <ChatBox teamId={Number(id)} userId={userLogged.id} />
                                 </Card.Body>
                             </Tab>
                         </Tabs>

@@ -11,6 +11,10 @@ import Teams from './pages/Teams';
 import OwnTeams from './pages/OwnTeams';
 import Addteams from './pages/AddTeams';
 import Team from './pages/Team';
+import Home from './pages/Home';
+import User from './pages/User';
+import EditTeams from './pages/EditTeams';
+import Chat from "./pages/Chat";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -50,14 +54,17 @@ function App() {
       <Router>
         <NavigationBar />
         <Routes>
-          <Route path='/' element={<h1>Home</h1>} />
+          <Route path='/' element={<Home />} />
           <Route path='settings' element={<Settings />} /> 
           <Route path='users' element={<Users />} /> 
+          <Route path='users/:id' element={<User />} />
           <Route path='teams' element={<Teams />} />
           <Route path='own-teams' element={<OwnTeams />} />
           <Route path='addteams' element={<Addteams />} />
+          <Route path='teams/:id/edit' element={<EditTeams />} />
           <Route path='teams/:id' element={<Team />} />
           <Route path='*' element={<h1>404 Not Found</h1>} />
+          <Route path='/teams/:id/chat' element={<Chat userId={0} teamId={0} />} />
         </Routes>
       </Router>
     </>

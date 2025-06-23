@@ -87,7 +87,7 @@ const Users = () => {
         location.reload();
     }
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (_id: number) => {
         // if(window.confirm('Czy na pewno chcesz usunąć użytkownika?')){
         //     if(await deleteUser(id.toString())){
         //         setAlertMsg({

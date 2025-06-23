@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getUser } from "../connection";
+import { getUser, deleteTeam } from "../connection";
 import { Table, Container, Alert } from "react-bootstrap";
 import '../style/table.css';
 import infoIcon from '../assets/info.svg';
@@ -20,24 +20,24 @@ const OwnTeams = () => {
     }, []);
 
     const handleDelete = async (id: number) => {
-        // if(window.confirm('Czy na pewno chcesz usunąć zespół?')){
-        //     if(await deleteTeam(id.toString())){
-        //         setAlertMsg({
-        //             variant: 'success',
-        //             msg: 'pomyślnie usunięto zespół'
-        //         });
-        //         const newData = {
-        //             ...data,
-        //             teams: data.teams.filter((team: any) => team.team.id != id)
-        //         };
-        //         setData(newData);
-        //     }else{
-        //         setAlertMsg({
-        //             variant: 'danger',
-        //             msg: 'Coś poszło nie tak przy próbie usunięcia zespołu'
-        //         });
-        //     }
-        // }
+        if(window.confirm('Czy na pewno chcesz usunąć zespół?')){
+            if(await deleteTeam(id.toString())){
+                setAlertMsg({
+                    variant: 'success',
+                    msg: 'pomyślnie usunięto zespół'
+                });
+                const newData = {
+                    ...data,
+                    teams: data.teams.filter((team: any) => team.id != id)
+                };
+                setData(newData);
+            }else{
+                setAlertMsg({
+                    variant: 'danger',
+                    msg: 'Coś poszło nie tak przy próbie usunięcia zespołu'
+                });
+            }
+        }
     }
     
 
@@ -72,7 +72,7 @@ const OwnTeams = () => {
                                         <a href={`/teams/${team.id}`}><img src={infoIcon} alt='info' width='20px' title='szczegóły' /></a>
                                         {team.owner.id == userLogged.id &&
                                             <>
-                                                <img src={deleteIcon} alt='del' width='20px' title='usuń' className='icon' onClick={() => handleDelete(team.team.id)} />
+                                                <img src={deleteIcon} alt='del' width='20px' title='usuń' className='icon' onClick={() => handleDelete(team.id)} />
                                                 <a href={`/teams/${team.id}/edit`}><img src={editIcon} alt='edit' width='20px' title='edytuj' /></a>
                                             </>
                                         }

@@ -1,4 +1,4 @@
-import { add } from "date-fns";
+// import { add } from "date-fns";
 
 const href = 'http://127.0.0.1:8080';
 
@@ -169,6 +169,36 @@ export const createTeam = async (name: string, description: string) => {
     }
 }
 
+export const updateTeam = async (id: string, name: string, description: string) => {
+    const response = await fetch(`${href}/teams/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, description }),
+    });
+    if (response.ok) {
+        const data = await response.json();
+        return data;
+    } else {
+        return null;
+    }
+}
+
+export const deleteTeam = async (id: string) => {
+    const response = await fetch(`${href}/teams/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+    });
+
+    if (response.ok) {
+        return true;
+    } else return false;
+}
+
 export const addTeamMember = async (teamId: string, email: string, setUserAlertMsg: React.Dispatch<any>) => {
     const response = await fetch(`${href}/teams/${teamId}/users`, {
         method: 'POST',
@@ -195,5 +225,20 @@ export const addTeamMember = async (teamId: string, email: string, setUserAlertM
             variant: 'danger',
             msg: 'Coś poszło nie tak przy próbie dodania użytkownika do zespołu'
         });
+    }
+}
+
+export const removeTeamMember = async (teamId: string, userId: string) => {
+    const response = await fetch(`${href}/teams/${teamId}/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+    });
+
+    if (response.ok) {
+        return true;
+    } else {
+        return false;
     }
 }

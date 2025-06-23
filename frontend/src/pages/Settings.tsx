@@ -42,7 +42,7 @@ const Settings = () => {
         <Form.Group as={Row} className="my-3">
           <Form.Label column sm={2}>Nazwa:</Form.Label>
           <Col sm={10}>
-            <Form.Control type="text" placeholder={user.name} required />
+            <Form.Control type="text" defaultValue={user.name} required />
           </Col>
         </Form.Group>
         <Button variant="primary" type="submit" className="my-3">Zapisz</Button>

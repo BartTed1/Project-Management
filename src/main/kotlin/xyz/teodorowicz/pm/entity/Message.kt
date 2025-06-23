@@ -11,7 +11,8 @@ data class Message(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
-    
+
+    @Column
     val content: String,
 
     @Column(nullable = false, updatable = false)
