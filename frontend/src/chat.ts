@@ -4,7 +4,7 @@ import SockJS from 'sockjs-client';
 let client: any = null;
 
 export function connect(onMessage: (msg: any) => void) {
-    const sock = new SockJS('http://localhost:8080/ws');
+    const sock = new SockJS('/ws');
     client = webstomp.over(sock);
 
     client.connect({}, () => {

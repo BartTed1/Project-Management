@@ -6,4 +6,13 @@ export default defineConfig({
   define: {
     global: 'window',
   },
+  server: {
+    proxy: {
+      '/ws': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        ws: true
+      }
+    }
+  }
 });
