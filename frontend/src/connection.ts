@@ -242,3 +242,55 @@ export const removeTeamMember = async (teamId: string, userId: string) => {
         return false;
     }
 }
+
+export const createTask = async (teamId: number, title: string, priority: string, deadline: string, userId: number, description: string) => {
+    const response = await fetch(`${href}/tasks`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({title, description, priority, deadline, userId, teamId}),
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+export const getTasks = async (teamId: string) => {
+    const response = await fetch(`${href}/tasks/team/${teamId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } else {
+        return null;
+    }
+}
+
+export const getTask = async (id: string) => {
+    const response = await fetch(`${href}/tasks/${id}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        return data;
+    } else {
+        return null;    
+    }
+}

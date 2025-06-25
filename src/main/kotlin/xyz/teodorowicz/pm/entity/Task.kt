@@ -1,9 +1,10 @@
 package xyz.teodorowicz.pm.entity
 
-import com.fasterxml.jackson.annotation.JsonBackReference
+import com.fasterxml.jackson.annotation.*
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import xyz.teodorowicz.pm.dto.response.TaskResponse
 import java.time.LocalDateTime
 
 @Entity
@@ -41,12 +42,13 @@ data class Task(
     var reminder: String = "NONE",
 
     @ManyToOne
-    @JsonBackReference("tasks")
-    @JoinColumn(name = "userId")
+    @JsonBackReference
+    @JoinColumn(name = "userId", nullable = false)
     var user: User? = null,
 
     @ManyToOne
     @JsonBackReference("tasks")
-    @JoinColumn(name = "teamId")
+    @JoinColumn(name = "teamId", nullable = false)
     var team: Team? = null
+
 )
