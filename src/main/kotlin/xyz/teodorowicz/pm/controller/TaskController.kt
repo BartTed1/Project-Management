@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import xyz.teodorowicz.pm.annotation.JwtToken
 import xyz.teodorowicz.pm.dto.request.task.CreateTaskRequest
 import xyz.teodorowicz.pm.dto.request.team.CreateTeamRequest
+import xyz.teodorowicz.pm.dto.response.TaskResponse
 import xyz.teodorowicz.pm.entity.Task
 import xyz.teodorowicz.pm.entity.Team
 import xyz.teodorowicz.pm.model.JwtTokenData
@@ -36,7 +37,7 @@ interface TaskController {
     fun getTask(
         @JwtToken token: JwtTokenData?,
         @PathVariable("taskId") taskId: String
-    ) : ResponseEntity<Task>
+    ) : ResponseEntity<TaskResponse>
 
     /**
      * Creates a new task with the given details.

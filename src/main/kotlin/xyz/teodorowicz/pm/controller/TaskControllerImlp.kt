@@ -12,12 +12,15 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import xyz.teodorowicz.pm.annotation.JwtToken
 import xyz.teodorowicz.pm.dto.request.task.CreateTaskRequest
+import xyz.teodorowicz.pm.dto.response.TaskResponse
 import xyz.teodorowicz.pm.entity.Task
+import xyz.teodorowicz.pm.entity.Team
 import xyz.teodorowicz.pm.exception.InternalServerErrorException
 import xyz.teodorowicz.pm.model.JwtTokenData
 import xyz.teodorowicz.pm.repository.TaskRepository
 import xyz.teodorowicz.pm.repository.TeamRepository
 import xyz.teodorowicz.pm.repository.UserRepository
+import xyz.teodorowicz.pm.mapper.toResponse
 
 @RestController
 @RequestMapping("tasks")
@@ -51,6 +54,38 @@ class TaskControllerImlp(
         }
     }
 
+    @GetMapping("/team/{teamId}")
+    @Operation(
+        summary = "Get tasks by team ID",
+        description = "Retrieves paginated tasks for a specific team"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Tasks retrieved successfully"),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "404", description = "Team not found")
+        ]
+    )
+    fun getTasksByTeamId(
+        @Parameter(description = "Team ID")
+        @PathVariable teamId: Long,
+
+        @Parameter(hidden = true)
+        pageable: Pageable,
+
+        @JwtToken token: JwtTokenData?
+    ): ResponseEntity<Page<TaskResponse>> {
+        return try {
+            val taskPage = taskRepository.findAllByTeamId(teamId, pageable)
+            val taskResponsePage = taskPage.map { it.toResponse() }
+            ResponseEntity.ok(taskResponsePage)
+        } catch (e: Exception) {
+            throw InternalServerErrorException()
+        }
+    }
+
+
+
     @GetMapping("/{taskId}")
     @Operation(summary = "Get task by ID", description = "Retrieves the team with the specified ID.")
     @ApiResponses(
@@ -66,10 +101,13 @@ class TaskControllerImlp(
 
         @Parameter(name = "task ID", description = "ID of the task to be retrieved")
         @PathVariable taskId: String
-    ): ResponseEntity<Task> {
+    ): ResponseEntity<TaskResponse> {
         val task = taskRepository.findById(taskId)
-        if(task.isEmpty) return ResponseEntity.notFound().build()
-        else return ResponseEntity.ok(task.get())
+        return if (task.isEmpty) {
+            ResponseEntity.notFound().build()
+        } else {
+            ResponseEntity.ok(task.get().toResponse())
+        }
     }
 
     @PostMapping
@@ -103,6 +141,7 @@ class TaskControllerImlp(
             user = user,
             team = team
         )
+        task.team?.let { println(it.id) }
 
 //        TODO("powiadomienie")
 

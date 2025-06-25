@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getTeam, addTeamMember, deleteTeam, removeTeamMember  } from "../connection";
+import { getTeam, addTeamMember, deleteTeam, removeTeamMember, getTasks  } from "../connection";
 import { Alert, Card, Col, Container, Row, Tab, Table, Tabs, Form, Button } from "react-bootstrap";
 import infoIcon from '../assets/info.svg';
 import deleteIcon from '../assets/delete.svg';
 import editIcon from '../assets/edit.svg';
 import ChatBox from "../components/ChatBox";
+import checkIcon from '../assets/check.svg';
+import cancelIcon from '../assets/cancel.svg';
+import Status from "../components/Status";
+import Priority from "../components/Priority";
+import DateTime from "../components/DateTime";
 
 const Team = () => {
     const [alertMsg, setAlertMsg] = useState(null as any);
@@ -13,18 +18,29 @@ const Team = () => {
     const userLogged = JSON.parse(localStorage.getItem('user') as string)
     const { id } = useParams<{ id: string }>();
     const [data, setData] = useState(null as any);
+    const [tasks, setTasks] = useState(null as any);
     const [error, setError] = useState(null as any);
 
     const fetchTeams = async () => {
           if (id) {
             const data = await getTeam(id);
+            console.log(data);
             if (data.error) setError(data.error);
             else setData(data);
           }
         };
 
+    const fetchTasks = async () => {
+        if (id) {
+            const tasks = await getTasks(id);
+            if (tasks.error) setError(tasks.error);
+            else setTasks(tasks.content);
+        }
+    }
+
     useEffect(() => { 
         fetchTeams();
+        fetchTasks();
     }, [id]);
     
 
@@ -72,6 +88,60 @@ const Team = () => {
         }
     }
 
+    const handleDeleteTask = async (taskId: number) => {
+        // if(window.confirm('Czy na pewno chcesz usunąć zadanie?')){
+        //     if(await deleteTask(taskId)){
+        //         setAlertMsg({
+        //             variant: 'success',
+        //             msg: 'pomyślnie usunięto zadanie'
+        //         });
+        //         const data = await getTeam(id as string);
+        //         setData(data);
+        //     }else{
+        //         setAlertMsg({
+        //             variant: 'danger',
+        //             msg: 'Coś poszło nie tak przy próbie usunięcia zadania'
+        //         });
+        //     }
+        // }
+    }
+
+    const handleConfirmTask = async (taskId: number) => {
+        // if(window.confirm('Czy na pewno chcesz zakończyć zadanie?')){
+        //     if(await updateStatusTask(taskId, 'COMPLETED')){
+        //         setAlertMsg({
+        //             variant: 'success',
+        //             msg: 'pomyślnie zakończono zadanie'
+        //         });
+        //         const data = await getTeam(id as string);
+        //         setData(data);
+        //     }else{
+        //         setAlertMsg({
+        //             variant: 'danger',
+        //             msg: 'Coś poszło nie tak przy próbie zakończenia zadania'
+        //         });
+        //     }
+        // }
+    }
+
+    const handleCancelTask = async (taskId: number) => {
+        // if(window.confirm('Czy na pewno chcesz zakończyć zadanie?')){
+        //     if(await updateStatusTask(taskId, 'UNCOMPLETED')){
+        //         setAlertMsg({
+        //             variant: 'success',
+        //             msg: 'pomyślnie zakończono zadanie'
+        //         });
+        //         const data = await getTeam(id as string);
+        //         setData(data);
+        //     }else{
+        //         setAlertMsg({
+        //             variant: 'danger',
+        //             msg: 'Coś poszło nie tak przy próbie zakończenia zadania'
+        //         });
+        //     }
+        // }
+    }
+
 
     if (!data) return <>{alertMsg && <Alert variant={alertMsg.variant}>{alertMsg.msg}</Alert>}</>;
 
@@ -105,9 +175,6 @@ const Team = () => {
                                             <a href={`/teams/${data.id}/edit`}><img src={editIcon} alt='edit' width='20px' title='edytuj' /></a>
                                         </Card.Text>
                                     )}
-                                    <Card.Text>
-                                        <Button >Generuj raport</Button>
-                                    </Card.Text>
                                 </Card.Body>
                             </Tab>
                             <Tab eventKey="members" title="Członkowie">
@@ -161,12 +228,99 @@ const Team = () => {
                             </Tab>
                             <Tab eventKey="tasks" title="Wszystkie zadania">
                                 <Card.Body>
-                                    Wielu spośród żyjących zasługuje na śmierć. A niejeden z tych, którzy umierają zasługuje na życie. Czy możesz ich nim obdarzyć? Nie bądź więc tak pochopny w ferowaniu wyroków śmierci, nawet bowiem najmądrzejszy nie wszystko wie.
+                                    {userLogged.id === data.owner.id && (<a href={`/teams/${id}/addTask`} className='btn btn-primary mb-4'>Utwórz Zadanie</a>)}
+                                        <div className="table-responsive">
+                                        <Table striped bordered hover variant='dark'>
+                                            <thead className='thead text-center'>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Tytuł</th>
+                                                    <th>Status</th>
+                                                    <th>Priorytet</th>
+                                                    <th>Termin</th>
+                                                    <th>Oddany</th>
+                                                    <th>Wykonawca</th>
+                                                    <th>Akcje</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {Array.isArray(tasks) && tasks.map((task: any) => (
+                                                    <tr key={task.id}>
+                                                        <td>{task.id}</td>
+                                                        <td>{task.title}</td>
+                                                        <td><Status status={task.status} /></td>
+                                                        <td><Priority priority={task.priority} /></td>
+                                                        <td><DateTime date={task.deadline} /></td>
+                                                        <td>{task.endAt ? <DateTime date={task.endAt} /> : "-"}</td>
+                                                        <td>{task.user.name}</td>
+                                                        <td>
+                                                            <a href={`/tasks/${task.id}`}><img src={infoIcon} alt='info' width='20px' title='szczegóły' /></a>
+                                                            {userLogged.id === data.owner.id && (
+                                                                <>
+                                                                    <img src={deleteIcon} alt='del' width='20px' title='usuń' className='icon' onClick={() => handleDeleteTask(task.id)}/>
+                                                                    <a href={`/tasks/${task.id}/edit`}><img src={editIcon} alt='edit' width='20px' title='edytuj' /></a>
+                                                                </>
+                                                            )}
+                                                            {task.status === 'DURING' && (task.user.id === userLogged.id || userLogged.id === data.owner.id) && (
+                                                                <>
+                                                                    <img src={checkIcon} alt='check' width='20px' title='zakończ pozytywnie' className='icon' onClick={() => handleConfirmTask(task.id)} />
+                                                                    <img src={cancelIcon} alt='cancel' width='20px' title='zakończ negatywnie' className='icon' onClick={() => handleCancelTask(task.id)} />
+                                                                </>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    </div>
                                 </Card.Body>
                             </Tab>
                             <Tab eventKey="your-tasks" title="Twoje zadania">
                                 <Card.Body>
-                                   Czasem niebezpiecznie jest wyjść z domu, gdy staniesz na drodze, nigdy nie wiadomo, dokąd cię nogi poniosą
+                                    {userLogged.id === data.owner.id && (<a href={`/teams/${id}/addTask`} className='btn btn-primary mb-4'>Utwórz Zadanie</a>)}
+                                    <div className="table-responsive">
+                                        <Table striped bordered hover variant='dark'>
+                                            <thead className='thead text-center'>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Tytuł</th>
+                                                    <th>Status</th>
+                                                    <th>Priorytet</th>
+                                                    <th>Termin</th>
+                                                    <th>Oddany</th>
+                                                    <th>Akcje</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {Array.isArray(tasks) && tasks.map((task: any) => (
+                                                    task.user.id === userLogged.id &&
+                                                    <tr key={task.id}>
+                                                        <td>{task.id}</td>
+                                                        <td>{task.title}</td>
+                                                        <td><Status status={task.status} /></td>
+                                                        <td><Priority priority={task.priority} /></td>
+                                                        <td><DateTime date={task.deadline} /></td>
+                                                        <td>{task.endAt ? <DateTime date={task.endAt} /> : "-"}</td>
+                                                        <td>
+                                                            <a href={`/tasks/${task.id}`}><img src={infoIcon} alt='info' width='20px' title='szczegóły' /></a>
+                                                            {userLogged.id === data.owner.id && (
+                                                                <>
+                                                                    <img src={deleteIcon} alt='del' width='20px' title='usuń' className='icon' onClick={() => handleDeleteTask(task.id)}/>
+                                                                    <a href={`/tasks/${task.id}/edit`}><img src={editIcon} alt='edit' width='20px' title='edytuj' /></a>
+                                                                </>
+                                                            )}
+                                                            {task.status === 'DURING' && (task.user.id === userLogged.id || userLogged.id === data.owner.id) && (
+                                                                <>
+                                                                    <img src={checkIcon} alt='check' width='20px' title='zakończ pozytywnie' className='icon' onClick={() => handleConfirmTask(task.id)} />
+                                                                    <img src={cancelIcon} alt='cancel' width='20px' title='zakończ negatywnie' className='icon' onClick={() => handleCancelTask(task.id)} />
+                                                                </>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    </div>
                                 </Card.Body>
                             </Tab>
                             <Tab eventKey="files" title="Pliki">
