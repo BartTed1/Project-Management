@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getTask } from "../connection";
+import { getTask, deleteTask, updateStatusTask } from "../connection";
 import { Alert, Card, Col, Container, Row } from "react-bootstrap";
 import DateTime from "../components/DateTime";
 import Status from "../components/Status";
@@ -31,57 +31,57 @@ const Task = () => {
     }, [id]);
 
     const handleDeleteTask = async (taskId: number) => {
-        // if(window.confirm('Czy na pewno chcesz usunąć zadanie?')){
-        //     if(await deleteTask(taskId)){
-        //         setAlertMsg({
-        //             variant: 'success',
-        //             msg: 'pomyślnie usunięto zadanie'
-        //         });
-        //         const data = await getTask(id as string);
-        //         setData(data);
-        //     }else{
-        //         setAlertMsg({
-        //             variant: 'danger',
-        //             msg: 'Coś poszło nie tak przy próbie usunięcia zadania'
-        //         });
-        //     }
-        // }
+        if(window.confirm('Czy na pewno chcesz usunąć zadanie?')){
+            if(await deleteTask(taskId.toString())){
+                setAlertMsg({
+                    variant: 'success',
+                    msg: 'pomyślnie usunięto zadanie'
+                });
+                const data = await getTask(id as string);
+                setData(data);
+            }else{
+                setAlertMsg({
+                    variant: 'danger',
+                    msg: 'Coś poszło nie tak przy próbie usunięcia zadania'
+                });
+            }
+        }
     }
 
     const handleConfirmTask = async (taskId: number) => {
-        // if(window.confirm('Czy na pewno chcesz zakończyć zadanie?')){
-        //     if(await updateStatusTask(taskId, 'COMPLETED')){
-        //         setAlertMsg({
-        //             variant: 'success',
-        //             msg: 'pomyślnie zakończono zadanie'
-        //         });
-        //         const data = await getTask(id as string);
-        //         setData(data);
-        //     }else{
-        //         setAlertMsg({
-        //             variant: 'danger',
-        //             msg: 'Coś poszło nie tak przy próbie zakończenia zadania'
-        //         });
-        //     }
-        // }
+        if(window.confirm('Czy na pewno chcesz zakończyć zadanie?')){
+            if(await updateStatusTask(taskId, 'COMPLETED')){
+                setAlertMsg({
+                    variant: 'success',
+                    msg: 'pomyślnie zakończono zadanie'
+                });
+                const data = await getTask(id as string);
+                setData(data);
+            }else{
+                setAlertMsg({
+                    variant: 'danger',
+                    msg: 'Coś poszło nie tak przy próbie zakończenia zadania'
+                });
+            }
+        }
     }
 
     const handleCancelTask = async (taskId: number) => {
-        // if(window.confirm('Czy na pewno chcesz zakończyć zadanie?')){
-        //     if(await updateStatusTask(taskId, 'UNCOMPLETED')){
-        //         setAlertMsg({
-        //             variant: 'success',
-        //             msg: 'pomyślnie zakończono zadanie'
-        //         });
-        //         const data = await getTask(id as string);
-        //         setData(data);
-        //     }else{
-        //         setAlertMsg({
-        //             variant: 'danger',
-        //             msg: 'Coś poszło nie tak przy próbie zakończenia zadania'
-        //         });
-        //     }
-        // }
+        if(window.confirm('Czy na pewno chcesz zakończyć zadanie?')){
+            if(await updateStatusTask(taskId, 'UNCOMPLETED')){
+                setAlertMsg({
+                    variant: 'success',
+                    msg: 'pomyślnie zakończono zadanie'
+                });
+                const data = await getTask(id as string);
+                setData(data);
+            }else{
+                setAlertMsg({
+                    variant: 'danger',
+                    msg: 'Coś poszło nie tak przy próbie zakończenia zadania'
+                });
+            }
+        }
     }
 
     if (!data) return <>{alertMsg && <Alert variant={alertMsg.variant}>{alertMsg.msg}</Alert>}</>;
