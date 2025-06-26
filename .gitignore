@@ -42,3 +42,7 @@ out/
 ### fronend ###
 /frontend/node_modules/
 /frontend/dist/
+.DS_Store
+logs/
+src/.DS_Store
+src/main/resources/logback-spring.xml
