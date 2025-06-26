@@ -294,3 +294,55 @@ export const getTask = async (id: string) => {
         return null;    
     }
 }
+
+export const updateTask = async (id: number, title: string, priority: string, deadline: string, userId: number, description: string) => {
+    const response = await fetch(`${href}/tasks/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({title, description, priority, deadline, userId}),
+    });
+    if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+export const deleteTask = async (id: string) => {
+    const response = await fetch(`${href}/tasks/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+    });
+
+    if (response.ok) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+export const updateStatusTask = async (id: number, status: string) => {
+const response = await fetch(`${href}/tasks/${id}/status?status=${status}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        return true;
+    } else {
+        const err = await response.text();
+        console.error("Error updating task status:", err);
+        return false;
+    }
+}

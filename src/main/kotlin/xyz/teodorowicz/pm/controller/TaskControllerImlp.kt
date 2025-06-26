@@ -220,9 +220,10 @@ class TaskControllerImlp(
         @JwtToken token: JwtTokenData,
         @Parameter(name = "Task ID", description = "ID of the task to be updated")
         @PathVariable taskId: String,
-        @Parameter(name = "status", description = "status")
-        @RequestBody status: String
+        @Parameter(name = "status", description = "New status of the task")
+        @RequestParam status: String
     ): ResponseEntity<Task> {
+        println("====================id zadania: "+taskId)
         val task = taskRepository.findById(taskId)
             .orElseThrow { IllegalArgumentException("task not found") }
 
@@ -230,8 +231,9 @@ class TaskControllerImlp(
 
         taskRepository.save(task)
 
-    //        TODO("powiadomienie")
+        // TODO: notification logic
         return ResponseEntity.ok(task)
     }
+
 
 }
